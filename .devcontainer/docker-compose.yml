@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  conda-repo-template:
+  backtesting-workshop:
     environment:
       GH_TOKEN: ${GH_TOKEN}
     volumes:
@@ -14,6 +14,6 @@ services:
 
 volumes:
   vscode-server-extensions:
-    name: conda-repo-template-vscode-server-extensions
+    name: backtesting-workshop-vscode-server-extensions
   vscode-server-insiders-extensions:
-    name: conda-repo-template-vscode-server-insiders-extensions
+    name: backtesting-workshop-vscode-server-insiders-extensions

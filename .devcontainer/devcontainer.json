@@ -1,17 +1,17 @@
 {
-  "name": "conda-repo-template.templates.utkusarioglu.com",
+  "name": "backtesting-workshop.workshops.utkusarioglu.com",
   "dockerComposeFile": [
     "../.docker/docker-compose.dev.yml",
     "docker-compose.yml"
   ],
-  "service": "conda-repo-template",
-  "workspaceFolder": "/utkusarioglu-com/templates/conda-repo-template",
+  "service": "backtesting-workshop",
+  "workspaceFolder": "/utkusarioglu-com/workshops/backtesting-workshop",
   "customizations": {
     "vscode": {
       "settings": {
         "workbench.colorCustomizations": {
-          "activityBar.background": "#FF0000",
-          "activityBar.foreground": "#000000"
+          "activityBar.background": "#003d14",
+          "activityBar.foreground": "#ffffff"
         }
       },
       "extensions": [
