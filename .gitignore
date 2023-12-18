@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+__pycache__
+.ipynb_checkpoints
+.pytest_cache
+
+/artifacts
+/.certs
+/.ignore

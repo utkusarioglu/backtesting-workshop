@@ -1,0 +1,46 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Test Monitor",
+      "detail": "Run tests",
+      "type": "shell",
+      "command": "scripts/test-monitor.sh",
+      "args": [
+        "${file}"
+      ],
+      "icon": {
+        "color": "terminal.ansiYellow",
+        "id": "beaker"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false,
+        "close": false
+      }
+    },
+    {
+      "label": "Format Notebooks",
+      "detail": "Formats ipynb documents - This is needed because run-on-save fails",
+      "type": "shell",
+      "command": "black --ipynb src/**.ipynb",
+      "icon": {
+        "color": "terminal.ansiBlue",
+        "id": "compass"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true,
+        "close": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  conda-repo-template:
+    environment:
+      GH_TOKEN: ${GH_TOKEN}
+    volumes:
+      - type: volume
+        source: vscode-server-extensions
+        target: /home/default/.vscode-server/extensions
+      - type: volume
+        source: vscode-server-insiders-extensions
+        target: /home/default/.vscode-server-insiders/extensions
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+volumes:
+  vscode-server-extensions:
+    name: conda-repo-template-vscode-server-extensions
+  vscode-server-insiders-extensions:
+    name: conda-repo-template-vscode-server-insiders-extensions

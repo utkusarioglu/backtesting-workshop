@@ -1,0 +1,27 @@
+{
+  "jupyter.kernels.filter": [
+    {
+      "path": "/opt/conda/bin/python",
+      "type": "pythonEnvironment"
+    },
+    {
+      "path": "/usr/bin/python3",
+      "type": "pythonEnvironment"
+    }
+  ],
+  "runOnSave.commands": [
+    {
+      "match": "\\.env(\\.\\w+)?$",
+      "notMatch": "\\.example$",
+      "isAsync": true,
+      "command": "/scripts/create-env-example.sh"
+    },
+    {
+      "match": "\\.env$",
+      "isAsync": true,
+      "command": "gh secret set -f .env"
+    },
+  ],
+  "python.formatting.provider": "black",
+  "python.analysis.typeCheckingMode": "basic"
+}

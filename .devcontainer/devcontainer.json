@@ -1,0 +1,28 @@
+{
+  "name": "conda-repo-template.templates.utkusarioglu.com",
+  "dockerComposeFile": [
+    "../.docker/docker-compose.dev.yml",
+    "docker-compose.yml"
+  ],
+  "service": "conda-repo-template",
+  "workspaceFolder": "/utkusarioglu-com/templates/conda-repo-template",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "workbench.colorCustomizations": {
+          "activityBar.background": "#FF0000",
+          "activityBar.foreground": "#000000"
+        }
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-python.black-formatter",
+        "ms-python.vscode-pylance",
+        "tamasfe.even-better-toml",
+        "ms-python.flake8"
+      ]
+    }
+  },
+  "postCreateCommand": "scripts/post-create-command.sh"
+}
