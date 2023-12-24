@@ -1,14 +1,4 @@
 {
-  "jupyter.kernels.filter": [
-    {
-      "path": "/opt/conda/bin/python",
-      "type": "pythonEnvironment"
-    },
-    {
-      "path": "/usr/bin/python3",
-      "type": "pythonEnvironment"
-    }
-  ],
   "runOnSave.commands": [
     {
       "match": "\\.env(\\.\\w+)?$",
@@ -23,5 +13,9 @@
     },
   ],
   "python.formatting.provider": "black",
-  "python.analysis.typeCheckingMode": "basic"
+  "python.analysis.typeCheckingMode": "basic",
+  "jupyter.kernels.excludePythonEnvironments": [
+    "/opt/conda/bin/python",
+    "/usr/bin/python3"
+  ]
 }

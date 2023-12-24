@@ -1,0 +1,3 @@
+backtesting
+pandas-datareader
+# TA-Lib
