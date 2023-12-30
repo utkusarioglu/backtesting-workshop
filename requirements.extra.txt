@@ -1,3 +1,23 @@
+# Normally ships with vectorbt deps
+# tables 3.8.0 requires blosc2~=2.0.0, which is not installed.
+# tables 3.8.0 requires cython>=0.29.21, which is not installed.
+tables 
+
+# Resolves issue between jupyter and python-telegram-bot
+tornado>=6.2
+
 backtesting
 pandas-datareader
 TA-Lib
+
+yfinance
+python-binance
+ccxt
+alpaca-trade-api
+ray
+ta
+pandas_ta
+python-telegram-bot>=13.4,<20.0
+quantstats
+
+vectorbt
