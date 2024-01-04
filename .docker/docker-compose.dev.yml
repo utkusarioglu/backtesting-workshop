@@ -7,6 +7,7 @@ services:
 
     environment:
       PYTHONPATH: /utkusarioglu-com/workshops/backtesting-workshop
+      ARTIFACTS_ABSPATH: /utkusarioglu-com/workshops/backtesting-workshop/artifacts
     volumes:
       - type: bind
         source: ..
