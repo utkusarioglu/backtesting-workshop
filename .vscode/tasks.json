@@ -27,7 +27,7 @@
       "label": "Format Notebooks",
       "detail": "Formats ipynb documents - This is needed because run-on-save fails",
       "type": "shell",
-      "command": "black --ipynb src/**.ipynb",
+      "command": "black ${file}",
       "icon": {
         "color": "terminal.ansiBlue",
         "id": "compass"

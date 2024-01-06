@@ -31,6 +31,7 @@ class OptimizedMa:
         self.data_file_relpath = "/".join(
             [ARTIFACTS_ABSPATH, self.data_filename]
         )
+        self.data = dict(pd=dict(), np=dict())
 
     def get_data(self, days, interval):
         if isfile(self.data_file_relpath):
@@ -72,14 +73,22 @@ class OptimizedMa:
         ):
             close_resampled = close.resample(rsi_period).last()
             rsi_unaligned = RSI.run(close_resampled, rsi_window).real
-            rsi, _ = rsi_unaligned.align(
+            rsi_pd, _ = rsi_unaligned.align(
                 close, broadcast_axis=0, method="ffill", join="right", axis=0
             )
-            ma = vbt.MA.run(close, ma_window).ma.to_numpy()
+            ma_pd = vbt.MA.run(close, ma_window)
+
+            self.data["ma"] = {"pd": ma_pd, "np": ma_pd.ma.to_numpy()}
+            self.data["rsi"] = {"pd": rsi_pd, "np": rsi_pd.to_numpy()}
+
             close = close.to_numpy()
-            rsi = rsi.to_numpy()
+
             return produce_signal(
-                rsi, ma, close, entry_threshold, exit_threshold
+                self.data["rsi"]["np"],
+                self.data["ma"]["np"],
+                close,
+                entry_threshold,
+                exit_threshold,
             )
 
         self.indicator = vbt.IndicatorFactory(
