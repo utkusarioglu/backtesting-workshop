@@ -8,6 +8,7 @@ services:
     environment:
       PYTHONPATH: /utkusarioglu-com/workshops/backtesting-workshop
       ARTIFACTS_ABSPATH: /utkusarioglu-com/workshops/backtesting-workshop/artifacts
+      ASSETS_ABSPATH: /utkusarioglu-com/workshops/backtesting-workshop/assets
     volumes:
       - type: bind
         source: ..

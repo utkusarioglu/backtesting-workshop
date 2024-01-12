@@ -1,7 +1,7 @@
+from os.path import join
+from typing import Any
 import vectorbt as vbt
-from src.config import ARTIFACTS_ABSPATH
-
-PLOT_ARTIFACTS_PATH = f"{ARTIFACTS_ABSPATH}/plots"
+from src.config import PLOT_ARTIFACTS_ABSPATH
 
 
 def apply_vbt_settings():
@@ -23,6 +23,19 @@ def get_backtesting_plot_kwargs(stats):
     variables = c.difference(base)
     values = "-".join([str(getattr(strategy, v)) for v in variables])
     return {
-        "filename": f"{PLOT_ARTIFACTS_PATH}/{name}-{values}.html",
+        "filename": join(PLOT_ARTIFACTS_ABSPATH, f"{name}-{values}.html"),
         "open_browser": False,
     }
+
+
+# TODO get rid of `Any`
+def reload_module(module_relpath: str, attribute: str | None = None) -> Any:
+    import sys
+    import importlib
+
+    if sys.modules.get(module_relpath) is not None:
+        del sys.modules[module_relpath]
+    module = importlib.import_module(module_relpath.replace("/", "."))
+    if attribute:
+        return getattr(module, attribute)
+    return module
