@@ -15,10 +15,12 @@ env = {
     key: value for [key, value] in environ.items() if key in REQUIRED_ENV_VARS
 }
 
-locals().update(env)
-
 for required_env_var in REQUIRED_ENV_VARS:
-    if required_env_var not in locals():
+    if required_env_var not in env:
         raise ValueError(f"env.{required_env_var} is required")
 
-PLOT_ARTIFACTS_ABSPATH = join(env["ARTIFACTS_ABSPATH"], "plots")
+config = env
+
+config["PLOT_ARTIFACTS_ABSPATH"] = join(config["ARTIFACTS_ABSPATH"], "plots")
+config["FIGURE_FACECOLOR"] = "#151515"
+config["AXES_FACECOLOR"] = "#080808"

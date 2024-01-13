@@ -1,7 +1,48 @@
 from os.path import join
 from typing import Any
 import vectorbt as vbt
-from src.config import PLOT_ARTIFACTS_ABSPATH
+from src.config import config
+import matplotlib as mpl
+from matplotlib import style
+
+# from matplotlib import style, rcParams
+
+
+def apply_matplotlib_settings():
+    style.use("dark_background")
+    # style.use(
+    #     {
+    #         "axes.facecolor": "#1a1a1a",
+    #         "axes.edgecolor": "gray",
+    #         "axes.labelcolor": "white",
+    #         "text.color": "white",
+    #         "xtick.color": "#555555",
+    #         "ytick.color": "#555555",
+    #         "grid.color": "gray",
+    #         # "figure.facecolor": "#1a1a1a",
+    #         "figure.edgecolor": "#1a1a1a",
+    #         # "savefig.facecolor": "#1a1a1a",
+    #         # "savefig.edgecolor": "#1a1a1a",
+    #     }
+    # )
+    # rcParams["axes.facecolor"] = "#050505"
+    # rcParams["figure.facecolor"] = "#151515"
+    mpl.rcParams = {
+        **mpl.rcParams,
+        "axes.facecolor": "#050505",
+        "figure.facecolor": "#151515",
+        # "axes.facecolor": "#1a1a1a",
+        "axes.edgecolor": "gray",
+        "axes.labelcolor": "white",
+        "text.color": "white",
+        "xtick.color": "#666666",
+        "ytick.color": "#666666",
+        "grid.color": "gray",
+        # "figure.facecolor": "#1a1a1a",
+        "figure.edgecolor": "#1a1a1a",
+        # "savefig.facecolor": "#1a1a1a",
+        # "savefig.edgecolor": "#1a1a1a",
+    }
 
 
 def apply_vbt_settings():
@@ -9,8 +50,8 @@ def apply_vbt_settings():
         **vbt.settings["plotting"]["layout"],
         "width": 630,
         "template": "plotly_dark",
-        "plot_bgcolor": "#080808",
-        "paper_bgcolor": "#151515",
+        "plot_bgcolor": config["AXES_FACECOLOR"],
+        "paper_bgcolor": config["FIGURE_FACECOLOR"],
         "margin": dict(l=0, r=0, t=5, b=5),
     }
 
@@ -23,7 +64,9 @@ def get_backtesting_plot_kwargs(stats):
     variables = c.difference(base)
     values = "-".join([str(getattr(strategy, v)) for v in variables])
     return {
-        "filename": join(PLOT_ARTIFACTS_ABSPATH, f"{name}-{values}.html"),
+        "filename": join(
+            config["PLOT_ARTIFACTS_ABSPATH"], f"{name}-{values}.html"
+        ),
         "open_browser": False,
     }
 

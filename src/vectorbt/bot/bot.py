@@ -5,11 +5,13 @@ from typing import Literal
 from binance.client import Client
 from src.vectorbt.strategies.checks import Checks
 from time import sleep
-from src.config import (
-    BINANCE_SPOT_TESTNET_API_KEY,
-    BINANCE_SPOT_TESTNET_SECRET_KEY,
-    ARTIFACTS_ABSPATH,
-)
+
+# from src.config import (
+#     BINANCE_SPOT_TESTNET_API_KEY,
+#     BINANCE_SPOT_TESTNET_SECRET_KEY,
+#     ARTIFACTS_ABSPATH,
+# )
+from src.config import config
 from src.vectorbt.bot.constants import (
     SOURCE_COLUMNS,
     DATETIME_COLUMNS,
@@ -140,10 +142,10 @@ def evaluation_method(klines, asset, base):
 
 def main():
     b = BinanceTestnet(
-        BINANCE_SPOT_TESTNET_API_KEY,
-        BINANCE_SPOT_TESTNET_SECRET_KEY,
-        join(ARTIFACTS_ABSPATH, "bot/logs"),
-        join(ARTIFACTS_ABSPATH, "bot/account_data.json"),
+        config["BINANCE_SPOT_TESTNET_API_KEY"],
+        config["BINANCE_SPOT_TESTNET_SECRET_KEY"],
+        join(config["ARTIFACTS_ABSPATH"], "bot/logs"),
+        join(config["ARTIFACTS_ABSPATH"], "bot/account_data.json"),
     )
     b.run(evaluation_method, "BTC", "USDT", 30, 0.01)
 

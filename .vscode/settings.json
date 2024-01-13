@@ -10,7 +10,7 @@
       "match": "\\.env$",
       "isAsync": true,
       "command": "gh secret set -f .env"
-    },
+    }
   ],
   "python.formatting.provider": "black",
   "python.analysis.typeCheckingMode": "basic",

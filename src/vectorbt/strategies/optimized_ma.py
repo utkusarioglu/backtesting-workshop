@@ -1,11 +1,10 @@
-from os import getenv
 import vectorbt as vbt
 import pandas as pd
 from os.path import isfile
 import numpy as np
 from datetime import datetime, timedelta
 from numba import njit
-from src.config import ARTIFACTS_ABSPATH
+from src.config import config
 
 
 vbt.settings["plotting"]["layout"] = {
@@ -27,7 +26,7 @@ class OptimizedMa:
         self.pairs = [f"{t}-{base}" for t in tickers]
         self.data_filename = data_filename
         self.data_file_relpath = "/".join(
-            [ARTIFACTS_ABSPATH, self.data_filename]
+            [config["ARTIFACTS_ABSPATH"], self.data_filename]
         )
         self.data = dict(pd=dict(), np=dict())
 
