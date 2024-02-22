@@ -29,7 +29,7 @@ def apply_matplotlib_settings():
     # rcParams["figure.facecolor"] = "#151515"
     mpl.rcParams = {
         **mpl.rcParams,
-        "axes.facecolor": "#050505",
+        "axes.facecolor": "#111",
         "figure.facecolor": "#151515",
         # "axes.facecolor": "#1a1a1a",
         "axes.edgecolor": "gray",
