@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.cm as cm
 import numpy as np
 from collections import namedtuple
+import matplotlib.pyplot as plt
+
 
 Event = namedtuple("Event", ["year_range", "y_text", "text", "color", "ymax"])
 
@@ -50,3 +52,88 @@ def create_color_map(data):
         country: color for country, color in zip(data["countrycode"], colors)
     }
     return color_mapping
+
+
+def plot_countries(
+    ax,
+    color_mapping,
+    country_list,
+    country_codes,
+    gdp_pc,
+    start_year,
+    end_year,
+    log_scale=True,
+):
+    for country in country_list:
+        ax.spines.top.set_visible(False)
+        ax.spines.right.set_visible(False)
+        ax.set_xlabel("Year")
+        ax.set_ylabel("International Dollars")
+        country_gdp_pc = gdp_pc.loc[country]
+        interpolated = country_gdp_pc.loc[start_year:end_year].interpolate()[
+            country_gdp_pc.isnull()
+        ]
+        if log_scale:
+            ax.set_yscale("log")
+        ax.plot(
+            interpolated,
+            linestyle="--",
+            color=color_mapping[country],
+        )
+        ax.plot(
+            country_gdp_pc.loc[start_year:end_year],
+            color=color_mapping[country],
+            label=country_codes.loc[country]["country"],
+        )
+
+
+def draw_events(ax, events):
+    t_params = {"fontsize": 9, "va": "baseline", "ha": "center"}
+    ylim = ax.get_ylim()[1]
+    for event in events:
+        event_mid = sum(event.year_range) / 2
+        ax.text(
+            event_mid,
+            ylim * event.y_text,
+            event.text,
+            color=event.color,
+            **t_params
+        )
+        ax.axvspan(*event.year_range, color=event.color, alpha=0.2)
+        ax.axvline(
+            event_mid,
+            ymin=1,
+            ymax=event.ymax,
+            color=event.color,
+            clip_on=False,
+            alpha=0.15,
+        )
+
+
+def plot_with_events(
+    countries,
+    country_codes,
+    gdp_pc,
+    start_year,
+    end_year,
+    events,
+    color_mapping,
+):
+    fig, ax = plt.subplots()
+    # countries = ["CHN", "GBR", "USA", "IND"]
+    plot_countries(
+        ax=ax,
+        color_mapping=color_mapping,
+        country_list=countries,
+        country_codes=country_codes,
+        gdp_pc=gdp_pc,
+        start_year=start_year,
+        end_year=end_year,
+        log_scale=True,
+    )
+    ylim = ax.get_ylim()[1]
+    # events = define_events(ylim)
+    draw_events(ax, events)
+    fig.set_figwidth(18)
+    ax.legend()
+    fig.show()
