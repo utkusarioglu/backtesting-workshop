@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 Event = namedtuple("Event", ["year_range", "y_text", "text", "color", "ymax"])
 
 
-def get_data():
+def get_data(**excel_args):
     data_url = "https://github.com/QuantEcon/lecture-python-intro/raw/main/lectures/datasets/mpd2020.xlsx"
-    data = pd.read_excel(data_url, sheet_name="Full data")
+    data = pd.read_excel(data_url, **excel_args)
     return data
 
 
@@ -118,6 +118,7 @@ def plot_with_events(
     end_year,
     events,
     color_mapping,
+    log_scale=True,
 ):
     fig, ax = plt.subplots()
     # countries = ["CHN", "GBR", "USA", "IND"]
@@ -129,9 +130,9 @@ def plot_with_events(
         gdp_pc=gdp_pc,
         start_year=start_year,
         end_year=end_year,
-        log_scale=True,
+        log_scale=log_scale,
     )
-    ylim = ax.get_ylim()[1]
+    # ylim = ax.get_ylim()[1]
     # events = define_events(ylim)
     draw_events(ax, events)
     fig.set_figwidth(18)
