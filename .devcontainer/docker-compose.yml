@@ -1,8 +1,9 @@
-version: "3.9"
 services:
   backtesting-workshop:
     environment:
       GH_TOKEN: ${GH_TOKEN}
+    stdin_open: true
+    # tty: true
     volumes:
       - type: volume
         source: vscode-server-extensions
@@ -10,7 +11,7 @@ services:
       - type: volume
         source: vscode-server-insiders-extensions
         target: /home/default/.vscode-server-insiders/extensions
-    command: /bin/sh -c "while sleep 1000; do :; done"
+    # command: /bin/sh -c "while sleep 1000; do :; done"
 
 volumes:
   vscode-server-extensions:

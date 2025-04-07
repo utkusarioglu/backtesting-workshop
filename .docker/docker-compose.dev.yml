@@ -1,9 +1,7 @@
-version: "3.9"
-
 services:
   backtesting-workshop:
     container_name: backtesting-workshop
-    image: utkusarioglu/conda-econ-devcontainer:experiment-feat-music-sequencer-8
+    image: utkusarioglu/conda-econ-devcontainer:3.13-ubuntu-test-25
 
     environment:
       PYTHONPATH: /utkusarioglu-com/workshops/backtesting-workshop
@@ -13,3 +11,24 @@ services:
       - type: bind
         source: ..
         target: /utkusarioglu-com/workshops/backtesting-workshop
+
+  backtesting-workshop-postgres:
+    container_name: backtesting-workshop-postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    volumes:
+      - type: bind
+        source: ../src/sql
+        target: /sql
+      - type: bind
+        source: ../src/sql/migrations/init
+        target: /docker-entrypoint-initdb.d
+      - type: volume
+        source: postgres-data
+        target: /var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+    name: backtesting-workshop-postgres-data

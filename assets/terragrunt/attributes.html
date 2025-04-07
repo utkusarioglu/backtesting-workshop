@@ -1,0 +1,392 @@
+<h3 id="inputs"><a class="anchorjs-link " href="#inputs" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>inputs
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">inputs</code> attribute is a map that is used to specify
+  the input variables and their values to pass in to Terraform.
+  Each entry of the map will be passed to Terraform using <a
+    href="https://www.terraform.io/docs/configuration/variables.html#environment-variables">the environment variable
+    mechanism</a>. This means that each input
+  will be set using the form <code class=" highlighter-rouge language-plaintext">TF_VAR_variablename</code>, with the
+  value in <code class=" highlighter-rouge language-plaintext">json</code> encoded format.</p>
+
+<p>Note that because the values are being passed in with environment variables and <code
+    class=" highlighter-rouge language-plaintext">json</code>, the type information is lost
+  when crossing the boundary between Terragrunt and Terraform. You must specify the proper <a
+    href="https://www.terraform.io/docs/configuration/variables.html#type-constraints">type
+    constraint</a> on the variable in Terraform in
+  order for Terraform to process the inputs to the right type.</p>
+
+<p>Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">string</span>      <span class="token punctuation">=</span> <span class="token string">"string"</span>
+  <span class="token property">number</span>      <span class="token punctuation">=</span> <span class="token number">42</span>
+  <span class="token property">bool</span>        <span class="token punctuation">=</span> <span class="token boolean">true</span>
+  <span class="token property">list_string</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"a"</span>, <span class="token string">"b"</span>, <span class="token string">"c"</span><span class="token punctuation">]</span>
+  <span class="token property">list_number</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token number">1</span>, <span class="token number">2</span>, <span class="token number">3</span><span class="token punctuation">]</span>
+  <span class="token property">list_bool</span>   <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token boolean">true</span>, <span class="token boolean">false</span><span class="token punctuation">]</span>
+
+  <span class="token property">map_string</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">foo</span> <span class="token punctuation">=</span> <span class="token string">"bar"</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token property">map_number</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">foo</span> <span class="token punctuation">=</span> <span class="token number">42</span>
+    <span class="token property">bar</span> <span class="token punctuation">=</span> <span class="token number">12345</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token property">map_bool</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">foo</span> <span class="token punctuation">=</span> <span class="token boolean">true</span>
+    <span class="token property">bar</span> <span class="token punctuation">=</span> <span class="token boolean">false</span>
+    <span class="token property">baz</span> <span class="token punctuation">=</span> <span class="token boolean">true</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token property">object</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">str</span>  <span class="token punctuation">=</span> <span class="token string">"string"</span>
+    <span class="token property">num</span>  <span class="token punctuation">=</span> <span class="token number">42</span>
+    <span class="token property">list</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token number">1</span>, <span class="token number">2</span>, <span class="token number">3</span><span class="token punctuation">]</span>
+
+    <span class="token property">map</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+      <span class="token property">foo</span> <span class="token punctuation">=</span> <span class="token string">"bar"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token property">from_env</span> <span class="token punctuation">=</span> get_env(<span class="token string">"FROM_ENV"</span>, <span class="token string">"default"</span>)
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<h3 id="download_dir"><a class="anchorjs-link " href="#download_dir" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>download_dir
+</h3>
+
+<p>The terragrunt <code class=" highlighter-rouge language-plaintext">download_dir</code> string option can be used to
+  override the default download directory.</p>
+
+<p>The precedence is as follows: <code class=" highlighter-rouge language-plaintext">--terragrunt-download-dir</code>
+  command line option → <code class=" highlighter-rouge language-plaintext">TERRAGRUNT_DOWNLOAD</code> env variable →
+  <code class=" highlighter-rouge language-plaintext">download_dir</code> attribute of the <code
+    class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file in the module directory → <code
+    class=" highlighter-rouge language-plaintext">download_dir</code> attribute of the included
+  <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code>.
+</p>
+
+<p>It supports all terragrunt functions, i.e. <code
+    class=" highlighter-rouge language-plaintext">path_relative_from_include()</code>.</p>
+
+<h3 id="prevent_destroy"><a class="anchorjs-link " href="#prevent_destroy" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>prevent_destroy
+</h3>
+
+<p>Terragrunt <code class=" highlighter-rouge language-plaintext">prevent_destroy</code> boolean flag allows you to
+  protect selected Terraform module. It will prevent <code class=" highlighter-rouge language-plaintext">destroy</code>
+  or
+  <code class=" highlighter-rouge language-plaintext">destroy-all</code> command to actually destroy resources of the
+  protected module. This is useful for modules you want to
+  carefully protect, such as a database, or a module that provides auth.
+</p>
+
+<p>Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token keyword">terraform</span> <span class="token punctuation">{</span>
+  <span class="token property">source</span> <span class="token punctuation">=</span> <span class="token string">"git::git@github.com:foo/modules.git//app?ref=v0.0.3"</span>
+<span class="token punctuation">}</span>
+
+<span class="token property">prevent_destroy</span> <span class="token punctuation">=</span> <span class="token boolean">true</span>
+</code></pre>
+  </div>
+</div>
+
+<h3 id="skip"><a class="anchorjs-link " href="#skip" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>skip
+</h3>
+
+<p>The terragrunt <code class=" highlighter-rouge language-plaintext">skip</code> boolean flag can be used to protect
+  modules you don’t want any changes to or just to skip modules
+  that don’t define any infrastructure by themselves. When set to true, all terragrunt commands will skip the selected
+  module.</p>
+
+<p>Consider the following file structure:</p>
+
+<pre class=" language-tree"><code class=" language-tree">root
+├── terragrunt.hcl
+├── prod
+│   └── terragrunt.hcl
+├── dev
+│   └── terragrunt.hcl
+└── qa
+    └── terragrunt.hcl
+</code></pre>
+
+<p>In some cases, the root level <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file is
+  solely used to DRY up your Terraform configuration by being
+  included in the other <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> files. In this case,
+  you do not want the <code class=" highlighter-rouge language-plaintext">run-all</code> commands to process the root
+  level <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> since it does not define any
+  infrastructure by itself. To make the <code class=" highlighter-rouge language-plaintext">run-all</code> commands
+  skip the
+  root level <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file, you can set <code
+    class=" highlighter-rouge language-plaintext">skip = true</code>:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token property">skip</span> <span class="token punctuation">=</span> <span class="token boolean">true</span>
+</code></pre>
+  </div>
+</div>
+
+<p>The <code class=" highlighter-rouge language-plaintext">skip</code> flag must be set explicitly in terragrunt
+  modules that should be skipped. If you set <code class=" highlighter-rouge language-plaintext">skip = true</code> in
+  a
+  <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file that is included by another <code
+    class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file, only the <code
+    class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file that explicitly
+  set <code class=" highlighter-rouge language-plaintext">skip = true</code> will be skipped.
+</p>
+
+<h3 id="iam_role"><a class="anchorjs-link " href="#iam_role" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>iam_role
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">iam_role</code> attribute can be used to specify an IAM
+  role that Terragrunt should assume prior to invoking Terraform.</p>
+
+<p>The precedence is as follows: <code class=" highlighter-rouge language-plaintext">--terragrunt-iam-role</code>
+  command line option → <code class=" highlighter-rouge language-plaintext">TERRAGRUNT_IAM_ROLE</code> env variable →
+  <code class=" highlighter-rouge language-plaintext">iam_role</code> attribute of the <code
+    class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file in the module directory → <code
+    class=" highlighter-rouge language-plaintext">iam_role</code> attribute of the included
+  <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code>.
+</p>
+
+<p>Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token property">iam_role</span> <span class="token punctuation">=</span> <span class="token string">"arn:aws:iam::ACCOUNT_ID:role/ROLE_NAME"</span>
+</code></pre>
+  </div>
+</div>
+
+<p><strong>Notes:</strong></p>
+
+<ul>
+  <li>Value of <code class=" highlighter-rouge language-plaintext">iam_role</code> can reference local variables</li>
+  <li>Definitions of <code class=" highlighter-rouge language-plaintext">iam_role</code> included from other HCL files
+    through <code class=" highlighter-rouge language-plaintext">include</code></li>
+</ul>
+
+<h3 id="iam_assume_role_duration"><a class="anchorjs-link " href="#iam_assume_role_duration" aria-label="Anchor"
+    data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>iam_assume_role_duration
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">iam_assume_role_duration</code> attribute can be used to
+  specify the STS session duration, in seconds, for the IAM role that Terragrunt should assume prior to invoking
+  Terraform.</p>
+
+<p>The precedence is as follows: <code
+    class=" highlighter-rouge language-plaintext">--terragrunt-iam-assume-role-duration</code> command line option →
+  <code class=" highlighter-rouge language-plaintext">TERRAGRUNT_IAM_ASSUME_ROLE_DURATION</code> env variable →
+  <code class=" highlighter-rouge language-plaintext">iam_assume_role_duration</code> attribute of the <code
+    class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file in the module directory → <code
+    class=" highlighter-rouge language-plaintext">iam_assume_role_duration</code> attribute of the included
+  <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code>.
+</p>
+
+<p>Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token property">iam_assume_role_duration</span> <span class="token punctuation">=</span> <span class="token number">14400</span>
+</code></pre>
+  </div>
+</div>
+
+<h3 id="iam_assume_role_session_name"><a class="anchorjs-link " href="#iam_assume_role_session_name" aria-label="Anchor"
+    data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>iam_assume_role_session_name
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">iam_assume_role_session_name</code> attribute can be used
+  to specify the STS session name, for the IAM role that Terragrunt should assume prior to invoking Terraform.</p>
+
+<p>The precedence is as follows: <code
+    class=" highlighter-rouge language-plaintext">--terragrunt-iam-assume-role-session-name</code> command line option
+  → <code class=" highlighter-rouge language-plaintext">TERRAGRUNT_IAM_ASSUME_ROLE_SESSION_NAME</code> env variable →
+  <code class=" highlighter-rouge language-plaintext">iam_assume_role_session_name</code> attribute of the <code
+    class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file in the module directory → <code
+    class=" highlighter-rouge language-plaintext">iam_assume_role_session_name</code> attribute of the included
+  <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code>.
+</p>
+
+<h3 id="iam_web_identity_token"><a class="anchorjs-link " href="#iam_web_identity_token" aria-label="Anchor"
+    data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>iam_web_identity_token
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">iam_web_identity_token</code> attribute can be used along
+  with <code class=" highlighter-rouge language-plaintext">iam_role</code> to assume a role using
+  AssumeRoleWithWebIdentity. <code class=" highlighter-rouge language-plaintext">iam_web_identity_token</code> can be
+  set to either the token value (typically using <code class=" highlighter-rouge language-plaintext">get_env()</code>),
+  or the path to a file on disk.</p>
+
+<p>The precedence is as follows: <code
+    class=" highlighter-rouge language-plaintext">--terragrunt-iam-web-identity-token</code> command line option →
+  <code class=" highlighter-rouge language-plaintext">TERRRAGRUNT_IAM_ASSUME_ROLE_WEB_IDENTITY_TOKEN</code> env
+  variable →
+  <code class=" highlighter-rouge language-plaintext">iam_web_identity_token</code> attribute of the <code
+    class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file in the module directory → <code
+    class=" highlighter-rouge language-plaintext">iam_web_identity_token</code> attribute of the included
+  <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code>.
+</p>
+
+<p>The primary benefit of using AssumeRoleWithWebIdentity over regular AssumeRole is that it enables you to run
+  terragrunt in your CI/CD pipelines wihthout static AWS credentials.</p>
+
+<h4 id="git-provider-configuration"><a class="anchorjs-link " href="#git-provider-configuration" aria-label="Anchor"
+    data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>Git
+  Provider Configuration</h4>
+
+<p>To use AssumeRoleWithWebIdentity in your CI/CD environment, you must first configure an AWS <a
+    href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html">OpenID Connect
+    provider</a> to trust the OIDC service
+  provided by your git provider.</p>
+
+<p>Follow the instructions below for whichever Git provider you use:</p>
+
+<ul>
+  <li>GitLab: <a href="https://docs.gitlab.com/ee/ci/cloud_services/aws/">Configure OpenID Connect in AWS to retrieve
+      temporary credentials</a></li>
+  <li>GitHub: <a
+      href="https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services">Configuring
+      OpenID Connect in Amazon Web Services</a></li>
+  <li>CircleCI: <a href="https://circleci.com/docs/openid-connect-tokens/">Using OpenID Connect tokens in jobs</a>
+  </li>
+</ul>
+
+<p>Once you have configured your OpenID Connect Provider and configured the trust policy of your IAM role according to
+  the above instructions, you
+  can configure Terragrunt to use the Web Identity Token in the following manner.</p>
+
+<p>If your Git provider provides the OIDC token as an environment variable, pass it in to the <code
+    class=" highlighter-rouge language-plaintext">iam_web_identity_token</code> as follows</p>
+
+<pre class=" language-terragrunt"><code class=" language-terragrunt">iam_role = "arn:aws:iam::&lt;AWS account number&gt;:role/&lt;IAM role name&gt;"
+
+iam_web_identity_token = get_env("&lt;variable name&gt;")
+</code></pre>
+
+<p>If your Git provider provides the OIDC token as a file, simply pass the file path to <code
+    class=" highlighter-rouge language-plaintext">iam_web_identity_token</code></p>
+
+<pre class=" language-terragrunt"><code class=" language-terragrunt">iam_role = "arn:aws:iam::&lt;AWS account number&gt;:role/&lt;IAM role name&gt;"
+
+iam_web_identity_token = "/path/to/token/file" 
+</code></pre>
+
+<h3 id="terraform_binary"><a class="anchorjs-link " href="#terraform_binary" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>terraform_binary
+</h3>
+
+<p>The terragrunt <code class=" highlighter-rouge language-plaintext">terraform_binary</code> string option can be
+  used to override the default terraform binary path (which is
+  <code class=" highlighter-rouge language-plaintext">tofu</code>).
+</p>
+
+<p>The precedence is as follows: <code class=" highlighter-rouge language-plaintext">--terragrunt-tfpath</code>
+  command line option → <code class=" highlighter-rouge language-plaintext">TERRAGRUNT_TFPATH</code> env variable →
+  <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> in the module directory → included <code
+    class=" highlighter-rouge language-plaintext">terragrunt.hcl</code>
+</p>
+
+<h3 id="terraform_version_constraint"><a class="anchorjs-link " href="#terraform_version_constraint" aria-label="Anchor"
+    data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>terraform_version_constraint
+</h3>
+
+<p>The terragrunt <code class=" highlighter-rouge language-plaintext">terraform_version_constraint</code> string
+  overrides the default minimum supported version of terraform.
+  Terragrunt only officially supports the latest version of terraform, however in some cases an old terraform is
+  needed.</p>
+
+<p>Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token property">terraform_version_constraint</span> <span class="token punctuation">=</span> <span class="token string">"&gt;= 0.11"</span>
+</code></pre>
+  </div>
+</div>
+
+<h3 id="terragrunt_version_constraint"><a class="anchorjs-link " href="#terragrunt_version_constraint"
+    aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>terragrunt_version_constraint
+</h3>
+
+<p>The terragrunt <code class=" highlighter-rouge language-plaintext">terragrunt_version_constraint</code> string can
+  be used to specify which versions of the Terragrunt CLI can be used with your configuration. If the running version
+  of Terragrunt doesn’t match the constraints specified, Terragrunt will produce an error and exit without taking any
+  further actions.</p>
+
+<p>Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token property">terragrunt_version_constraint</span> <span class="token punctuation">=</span> <span class="token string">"&gt;= 0.23"</span>
+</code></pre>
+  </div>
+</div>
+
+<h3 id="retryable_errors"><a class="anchorjs-link " href="#retryable_errors" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>retryable_errors
+</h3>
+
+<p>The terragrunt <code class=" highlighter-rouge language-plaintext">retryable_errors</code> list can be used to
+  override the default list of retryable errors with your own custom list.
+  To learn more about the <code class=" highlighter-rouge language-plaintext">retryable_errors</code> attribute, see
+  the <a href="/docs/features/auto-retry">auto-retry feature overview</a>.</p>
+
+<p>Default List:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token property">retryable_errors</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span>
+  <span class="token string">"(?s).*Failed to load state.*tcp.*timeout.*"</span>,
+  <span class="token string">"(?s).*Failed to load backend.*TLS handshake timeout.*"</span>,
+  <span class="token string">"(?s).*Creating metric alarm failed.*request to update this alarm is in progress.*"</span>,
+  <span class="token string">"(?s).*Error installing provider.*TLS handshake timeout.*"</span>,
+  <span class="token string">"(?s).*Error configuring the backend.*TLS handshake timeout.*"</span>,
+  <span class="token string">"(?s).*Error installing provider.*tcp.*timeout.*"</span>,
+  <span class="token string">"(?s).*Error installing provider.*tcp.*connection reset by peer.*"</span>,
+  <span class="token string">"NoSuchBucket: The specified bucket does not exist"</span>,
+  <span class="token string">"(?s).*Error creating SSM parameter: TooManyUpdates:.*"</span>,
+  <span class="token string">"(?s).*app.terraform.io.*: 429 Too Many Requests.*"</span>,
+  <span class="token string">"(?s).*ssh_exchange_identification.*Connection closed by remote host.*"</span>,
+  <span class="token string">"(?s).*Client\\.Timeout exceeded while awaiting headers.*"</span>,
+  <span class="token string">"(?s).*Could not download module.*The requested URL returned error: 429.*"</span>,
+<span class="token punctuation">]</span>
+</code></pre>
+  </div>
+</div>
+
+<p>Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token property">retryable_errors</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span>
+  <span class="token string">"(?s).*Error installing provider.*tcp.*connection reset by peer.*"</span>,
+  <span class="token string">"(?s).*ssh_exchange_identification.*Connection closed by remote host.*"</span>
+<span class="token punctuation">]</span>
+</code></pre>
+  </div>
+</div>
+
+</div>

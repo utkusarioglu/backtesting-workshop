@@ -1,0 +1,816 @@
+<article class="markdown-body entry-content container-lg" itemprop="text">
+  <div class="markdown-heading" dir="auto">
+    <h1 tabindex="-1" class="heading-element" dir="auto">Appendix - Dynamic Gas Costs</h1><a
+      id="user-content-appendix---dynamic-gas-costs" class="anchor" aria-label="Permalink: Appendix - Dynamic Gas Costs"
+      href="#appendix---dynamic-gas-costs"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1"
+        width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">A0-0: Intrinsic Gas</h3><a id="user-content-a0-0-intrinsic-gas"
+      class="anchor" aria-label="Permalink: A0-0: Intrinsic Gas" href="#a0-0-intrinsic-gas"><svg
+        class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Intrinsic gas is the amount of gas paid prior to execution of a transaction.
+    That is, the gas paid by the initiator of a transaction, which will always be an externally-owned account, before
+    any state updates are made or any code is executed.</p>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = 21000</code>: base cost</li>
+    <li><strong>If</strong> <code>tx.to == null</code> (contract creation tx):
+      <ul dir="auto">
+        <li><code>gas_cost += 32000</code></li>
+      </ul>
+    </li>
+    <li><code>gas_cost += 4 * bytes_zero</code>: gas added to base cost for every zero byte of memory data</li>
+    <li><code>gas_cost += 16 * bytes_nonzero</code>: gas added to base cost for every nonzero byte of memory data</li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">A0-1: Memory Expansion</h3><a
+      id="user-content-a0-1-memory-expansion" class="anchor" aria-label="Permalink: A0-1: Memory Expansion"
+      href="#a0-1-memory-expansion"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16"
+        height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">An additional gas cost is paid by any operation that expands the memory that is in use.
+    This memory expansion cost is dependent on the existing memory size and is <code>0</code> if the operation does not
+    reference a memory address higher than the existing highest referenced memory address.
+    A reference is any read, write, or other usage of memory (such as in a <code>CALL</code>).</p>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>new_mem_size</code>: the highest referenced memory address after the operation in question (in bytes)</li>
+    <li><code>new_mem_size_words = (new_mem_size + 31) // 32</code>: number of (32-byte) words required for memory after
+      the operation in question</li>
+    <li><code><em>C<sub>mem</sub>(machine_state)</em></code>: the memory cost function for a given machine state</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = <em>C<sub>mem</sub>(new_state)</em> - <em>C<sub>mem</sub>(old_state)</em></code></li>
+    <li>
+      <code>gas_cost = (new_mem_size_words ^ 2 // 512) + (3 * new_mem_size_words) - <em>C<sub>mem</sub>(old_state)</em></code>
+    </li>
+  </ul>
+  <p dir="auto">Useful Notes:</p>
+  <ul dir="auto">
+    <li>The following opcodes incur a memory expansion cost in addition to their otherwise static gas cost:
+      <code>RETURN</code>, <code>REVERT</code>, <code>MLOAD</code>, <code>MSTORE</code>, <code>MSTORE8</code>.</li>
+    <li>Referencing a zero length range does not require memory to be extended to the beginning of the range.</li>
+    <li>The memory cost function is linear up to 724 bytes of memory used, at which point additional memory costs
+      substantially more.</li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">A0-2: Access Sets</h3><a id="user-content-a0-2-access-sets"
+      class="anchor" aria-label="Permalink: A0-2: Access Sets" href="#a0-2-access-sets"><svg
+        class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">As of <a href="https://eips.ethereum.org/EIPS/eip-2929" rel="nofollow">EIP-2929</a>, two
+    transaction-wide access sets are maintained.
+    These access sets keep track of which addresses and storage slots have already been touched within the current
+    transaction.</p>
+  <ul dir="auto">
+    <li><code>touched_addresses : Set[Address]</code>
+      <ul dir="auto">
+        <li>a set where every element is an address</li>
+        <li>initialized to include <code>tx.origin</code>, <code>tx.to</code>*, and all precompiles</li>
+        <li>* For a contract creation transaction, <code>touched_addresses</code> is initialized to include the address
+          of the created contract instead of <code>tx.to</code>, which is the zero address.</li>
+      </ul>
+    </li>
+    <li><code>touched_storage_slots : Set[(Address, Bytes32)]</code>
+      <ul dir="auto">
+        <li>a set where every element is a tuple, <code>(address, storage_key)</code></li>
+        <li>initialized to the empty set, <code>{}</code></li>
+      </ul>
+    </li>
+  </ul>
+  <p dir="auto">The access sets above are relevant for the following operations:</p>
+  <ul dir="auto">
+    <li>
+      <code>ADDRESS_TOUCHING_OPCODES := { EXTCODESIZE, EXTCODECOPY, EXTCODEHASH, BALANCE, CALL, CALLCODE, DELEGATECALL, STATICCALL, SELFDESTRUCT }</code>
+    </li>
+    <li><code>STORAGE_TOUCHING_OPCODES := { SLOAD, SSTORE }</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h4 tabindex="-1" class="heading-element" dir="auto">Updating the Access Sets</h4><a
+      id="user-content-updating-the-access-sets" class="anchor" aria-label="Permalink: Updating the Access Sets"
+      href="#updating-the-access-sets"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16"
+        height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">When an address is the target of one of the <code>ADDRESS_TOUCHING_OPCODES</code>, the address is
+    immediately added to the <code>touched_addresses</code> set.</p>
+  <ul dir="auto">
+    <li><code>touched addresses = touched_addresses ∪ { target_address }</code></li>
+  </ul>
+  <p dir="auto">When a storage slot is the target of one of the <code>STORAGE_TOUCHING_OPCODES</code>, the
+    <code>(address, key)</code> pair is immediately added to the <code>touched_storage_slots</code> set.</p>
+  <ul dir="auto">
+    <li><code>touched_storage_slots = touched_storage_slots ∪ { (current_address, target_storage_key) }</code></li>
+  </ul>
+  <p dir="auto">Important Notes:</p>
+  <ul dir="auto">
+    <li>Adding duplicate elements to these sets is a no-op. Performant implementations will use a map with more
+      complicated addition logic.</li>
+    <li>If an execution frame reverts, the access sets will return to the state they were in before the frame was
+      entered.</li>
+    <li>Additions to the <code>touched_addresses</code> set for <code>*CALL</code> and <code>CREATE*</code> opcodes are
+      made immediately <em>before</em> the new execution frames are entered, so any failure within a call or contract
+      creation will not remove the target address of the failing <code>*CALL</code> or <code>CREATE*</code> from the
+      <code>touched_addresses</code> set.
+      Some tricky edge cases:
+      <ul dir="auto">
+        <li>For <code>*CALL</code>, if the call fails for exceeding the maximum call depth or attempting to send more
+          value than the balance of the current address, the target address remains in the
+          <code>touched_addresses</code> set.</li>
+        <li>For <code>CREATE*</code>, if the contract creation fails for exceeding the maximum call depth or attempting
+          to send more value than the balance of the current address, the address of the created contract does
+          <strong>NOT</strong> remain in the <code>touched_addresses</code> set.</li>
+        <li>If a <code>CREATE*</code> operation fails for attempting to deploy a contract to a non-empty account, the
+          address of the created contract remains in the <code>touched_addresses</code> set.</li>
+      </ul>
+    </li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h4 tabindex="-1" class="heading-element" dir="auto">Pre-populating the Access Sets</h4><a
+      id="user-content-pre-populating-the-access-sets" class="anchor"
+      aria-label="Permalink: Pre-populating the Access Sets" href="#pre-populating-the-access-sets"><svg
+        class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto"><a href="https://eips.ethereum.org/EIPS/eip-2930" rel="nofollow">EIP-2930</a> introduced an optional
+    access <em>list</em> that can be included as part of a transaction.
+    This access list allows elements to be added to the <code>touched_addresses</code> and
+    <code>touched_storage_slots</code> access <em>sets</em> before execution of a transaction begins.
+    The cost for doing so is <code>2400</code> gas for each address added to <code>touched_addresses</code> and
+    <code>1900</code> gas for each <code>(address, storage_key)</code> pair added to <code>touched_storage_slots</code>.
+    This cost is charged at the same time as <a href="#a0-0-intrinsic-gas">intrinsic gas</a>.</p>
+  <p dir="auto">Important Notes:</p>
+  <ul dir="auto">
+    <li>No <code>(ADDR, storage_key)</code> pair can be added to <code>touched_storage_slots</code> without also adding
+      <code>ADDR</code> to <code>touched_addresses</code>.</li>
+    <li>The access list may contain duplicates.
+      The addition of a duplicate item to one of the access sets is a no-op, but the cost of addition is still charged.
+    </li>
+    <li>Providing an access list with a transaction can yield a modest discount for each unique access, but this is not
+      always the case.
+      See <a href="https://hackmd.io/@fvictorio/gas-costs-after-berlin"
+        rel="nofollow">@fvictorio/gas-costs-after-berlin</a> for a more complete discussion.</li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">A0-3: Gas Refunds</h3><a id="user-content-a0-3-gas-refunds"
+      class="anchor" aria-label="Permalink: A0-3: Gas Refunds" href="#a0-3-gas-refunds"><svg
+        class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Originally intended to provide incentive for clearing unused state, the total <code>gas_refund</code> is
+    tracked throughout the execution of a transaction.
+    As of <a href="https://eips.ethereum.org/EIPS/eip-3529" rel="nofollow">EIP-3529</a>, <code>SSTORE</code> is the only
+    operation that potentially provides a gas refund.</p>
+  <p dir="auto">The maximum refund for a transaction is capped at 1/5<sup>th</sup> the gas consumed for the entire
+    transaction.</p>
+  <div class="snippet-clipboard-content notranslate position-relative overflow-auto">
+    <pre class="notranslate"><code>refund_amt := min(gas_refund, tx.gas_consumed // 5)
+</code></pre>
+    <div class="zeroclipboard-container">
+      <clipboard-copy aria-label="Copy"
+        class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 d-flex flex-justify-center flex-items-center"
+        data-copy-feedback="Copied!" data-tooltip-direction="w"
+        value="refund_amt := min(gas_refund, tx.gas_consumed // 5)" tabindex="0" role="button">
+        <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+          class="octicon octicon-copy js-clipboard-copy-icon">
+          <path
+            d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z">
+          </path>
+          <path
+            d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z">
+          </path>
+        </svg>
+        <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+          class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+          <path
+            d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z">
+          </path>
+        </svg>
+      </clipboard-copy>
+    </div>
+  </div>
+  <p dir="auto">The gas consumed includes the <a href="#a0-0-intrinsic-gas">intrinsic gas</a>, the cost of <a
+      href="#pre-populating-the-access-sets">pre-populating</a> the access sets, and the cost of any code execution.</p>
+  <p dir="auto">When a transaction is finalized, the gas used by the transaction is decreased by
+    <code>refund_amt</code>.
+    This effectively reimburses <code>refund_amt&nbsp;*&nbsp;tx.gasprice</code> to <code>tx.origin</code>, but it has
+    the added effect of decreasing the impact of the transaction on the total gas consumed in the block (for purposes of
+    determining the block gas limit).</p>
+  <p dir="auto">Because the gas refund is not applied until the end of a transaction, a nonzero refund will not affect
+    whether or not a transaction results in an <code>OUT_OF_GAS</code> exception.</p>
+  <h1 dir="auto"></h1>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">A1: EXP</h2><a id="user-content-a1-exp" class="anchor"
+      aria-label="Permalink: A1: EXP" href="#a1-exp"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1"
+        width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>byte_len_exponent</code>: the number of bytes in the exponent (exponent is <code>b</code> in the stack
+      representation)</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = 10 + 50 * byte_len_exponent</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">A2: SHA3</h2><a id="user-content-a2-sha3" class="anchor"
+      aria-label="Permalink: A2: SHA3" href="#a2-sha3"><svg class="octicon octicon-link" viewBox="0 0 16 16"
+        version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>data_size</code>: size of the message to hash in bytes (<code>len</code> in the stack representation)</li>
+    <li><code>data_size_words = (data_size + 31) // 32</code>: number of (32-byte) words in the message to hash</li>
+    <li><code>mem_expansion_cost</code>: the cost of any memory expansion required (see <a
+        href="#a0-1-memory-expansion">A0-1</a>)</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = 30 + 6 * data_size_words + mem_expansion_cost</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">A3: *COPY Operations</h2><a
+      id="user-content-a3-copy-operations" class="anchor" aria-label="Permalink: A3: *COPY Operations"
+      href="#a3-copy-operations"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16"
+        height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">The following applies for the operations <code>CALLDATACOPY</code>, <code>CODECOPY</code>, and
+    <code>RETURNDATACOPY</code> (not <code>EXTCODECOPY</code>).</p>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>data_size</code>: size of the data to copy in bytes (<code>len</code> in the stack representation)</li>
+    <li><code>data_size_words = (data_size + 31) // 32</code>: number of (32-byte) words in the data to copy</li>
+    <li><code>mem_expansion_cost</code>: the cost of any memory expansion required (see <a
+        href="#a0-1-memory-expansion">A0-1</a>)</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = 3 + 3 * data_size_words + mem_expansion_cost</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">A4: EXTCODECOPY</h2><a id="user-content-a4-extcodecopy"
+      class="anchor" aria-label="Permalink: A4: EXTCODECOPY" href="#a4-extcodecopy"><svg class="octicon octicon-link"
+        viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>target_addr</code>: the address to copy code from (<code>addr</code> in the stack representation)</li>
+    <li><code>access_cost</code>: The cost of accessing a warm vs. cold account (see <a
+        href="#a0-2-access-sets">A0-2</a>)
+      <ul dir="auto">
+        <li><code>access_cost = 100</code> <strong>if</strong> <code>target_addr</code> <strong>in</strong>
+          <code>touched_addresses</code> (warm access)</li>
+        <li><code>access_cost = 2600</code> <strong>if</strong> <code>target_addr</code> <strong>not in</strong>
+          <code>touched_addresses</code> (cold access)</li>
+      </ul>
+    </li>
+    <li><code>data_size</code>: size of the data to copy in bytes (<code>len</code> in the stack representation)</li>
+    <li><code>data_size_words = (data_size + 31) // 32</code>: number of (32-byte) words in the data to copy</li>
+    <li><code>mem_expansion_cost</code>: the cost of any memory expansion required (see <a
+        href="#a0-1-memory-expansion">A0-1</a>)</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = access_cost + 3 * data_size_words + mem_expansion_cost</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">A5: BALANCE, EXTCODESIZE, EXTCODEHASH</h2><a
+      id="user-content-a5-balance-extcodesize-extcodehash" class="anchor"
+      aria-label="Permalink: A5: BALANCE, EXTCODESIZE, EXTCODEHASH" href="#a5-balance-extcodesize-extcodehash"><svg
+        class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">The opcodes <code>BALANCE</code>, <code>EXTCODESIZE</code>, <code>EXTCODEHASH</code> have the same
+    pricing function based on making a single account access.
+    See <a href="#a0-2-access-sets">A0-2</a> for details on EIP-2929 and <code>touched_addresses</code>.</p>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>target_addr</code>: the address of interest (<code>addr</code> in the opcode stack representations)</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = 100</code> <strong>if</strong> <code>target_addr</code> <strong>in</strong>
+      <code>touched_addresses</code> (warm access)</li>
+    <li><code>gas_cost = 2600</code> <strong>if</strong> <code>target_addr</code> <strong>not in</strong>
+      <code>touched_addresses</code> (cold access)</li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">A6: SLOAD</h2><a id="user-content-a6-sload" class="anchor"
+      aria-label="Permalink: A6: SLOAD" href="#a6-sload"><svg class="octicon octicon-link" viewBox="0 0 16 16"
+        version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">See <a href="#a0-2-access-sets">A0-2</a> for details on EIP-2929 and <code>touched_storage_slots</code>.
+  </p>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>context_addr</code>: the address of the current execution context (i.e. what <code>ADDRESS</code> would
+      put on the stack)</li>
+    <li><code>target_storage_key</code>: The 32-byte storage index to load from (<code>key</code> in the stack
+      representation)</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = 100</code> <strong>if</strong> <code>(context_addr, target_storage_key)</code>
+      <strong>in</strong> <code>touched_storage_slots</code> (warm access)</li>
+    <li><code>gas_cost = 2100</code> <strong>if</strong> <code>(context_addr, target_storage_key)</code> <strong>not
+        in</strong> <code>touched_storage_slots</code> (cold access)</li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">A7: SSTORE</h2><a id="user-content-a7-sstore" class="anchor"
+      aria-label="Permalink: A7: SSTORE" href="#a7-sstore"><svg class="octicon octicon-link" viewBox="0 0 16 16"
+        version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">This gets messy.
+    See <a href="https://eips.ethereum.org/EIPS/eip-2200" rel="nofollow">EIP-2200</a>, activated in the Istanbul
+    hardfork.</p>
+  <p dir="auto">The cost of an <code>SSTORE</code> operation is dependent on the existing value and the value to be
+    stored:</p>
+  <ol dir="auto">
+    <li>Zero vs. nonzero values - storing nonzero values is more costly than storing zero</li>
+    <li>The current value of the slot vs. the value to store - changing the value of a slot is more costly than not
+      changing it</li>
+    <li>"Dirty" vs. "clean" slot - changing a slot that has not yet been changed within the current execution context is
+      more costly than changing a slot that has already been changed</li>
+  </ol>
+  <p dir="auto">The cost is also dependent on whether or not the targeted storage slot has already been accessed within
+    the same transaction.
+    See <a href="#a0-2-access-sets">A0-2</a> for details on EIP-2929 and <code>touched_storage_slots</code>.</p>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>context_addr</code>: the address of the current execution context (i.e. what <code>ADDRESS</code> would
+      put on the stack)</li>
+    <li><code>target_storage_key</code>: The 32-byte storage index to store to (<code>key</code> in the stack
+      representation)</li>
+    <li><code>orig_val</code>: the value of the storage slot if the current transaction is reverted</li>
+    <li><code>current_val</code>: the value of the storage slot immediately <em>before</em> the <code>sstore</code> op
+      in question</li>
+    <li><code>new_val</code>: the value of the storage slot immediately <em>after</em> the <code>sstore</code> op in
+      question</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = 0</code></li>
+    <li><code>gas_refund = 0</code></li>
+    <li><strong>If</strong> <code>gas_left &lt;= 2300</code>:
+      <ul dir="auto">
+        <li><code>throw OUT_OF_GAS_ERROR</code> (can not <code>sstore</code> with &lt; 2300 gas for backwards
+          compatibility)</li>
+      </ul>
+    </li>
+    <li><strong>If</strong> <code>(context_addr, target_storage_key)</code> <strong>not in</strong>
+      <code>touched_storage_slots</code> (<a href="#a0-2-access-sets">cold access</a>):
+      <ul dir="auto">
+        <li><code>gas_cost += 2100</code></li>
+      </ul>
+    </li>
+    <li><strong>If</strong> <code>new_val == current_val</code> (no-op):
+      <ul dir="auto">
+        <li><code>gas_cost += 100</code></li>
+      </ul>
+    </li>
+    <li><strong>Else</strong> <code>new_val != current_val</code>:
+      <ul dir="auto">
+        <li><strong>If</strong> <code>current_val == orig_val</code> ("clean slot", not yet updated in current execution
+          context):
+          <ul dir="auto">
+            <li><strong>If</strong> <code>orig_val == 0</code> (slot started zero, currently still zero, now being
+              changed to nonzero):
+              <ul dir="auto">
+                <li><code>gas_cost += 20000</code></li>
+              </ul>
+            </li>
+            <li><strong>Else</strong> <code>orig_val != 0</code> (slot started nonzero, currently still same nonzero
+              value, now being changed):
+              <ul dir="auto">
+                <li><code>gas_cost += 2900</code> and update the refund as follows..</li>
+                <li><strong>If</strong> <code>new_val == 0</code> (the value to store is 0):
+                  <ul dir="auto">
+                    <li><code>gas_refund += 4800</code></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><strong>Else</strong> <code>current_val != orig_val</code> ("dirty slot", already updated in current
+          execution context):
+          <ul dir="auto">
+            <li><code>gas_cost += 100</code> and update the refund as follows..</li>
+            <li><strong>If</strong> <code>orig_val != 0</code> (execution context started with a nonzero value in slot):
+              <ul dir="auto">
+                <li><strong>If</strong> <code>current_val == 0</code> (slot started nonzero, currently zero, now being
+                  changed to nonzero):
+                  <ul dir="auto">
+                    <li><code>gas_refund -= 4800</code></li>
+                  </ul>
+                </li>
+                <li><strong>Else if</strong> <code>new_val == 0</code> (slot started nonzero, currently still nonzero,
+                  now being changed to zero):
+                  <ul dir="auto">
+                    <li><code>gas_refund += 4800</code></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><strong>If</strong> <code>new_val == orig_val</code> (slot is reset to the value it started with):
+              <ul dir="auto">
+                <li><strong>If</strong> <code>orig_val == 0</code> (slot started zero, currently nonzero, now being
+                  reset to zero):
+                  <ul dir="auto">
+                    <li><code>gas_refund += 19900</code></li>
+                  </ul>
+                </li>
+                <li><strong>Else</strong> <code>orig_val != 0</code> (slot started nonzero, currently different nonzero
+                  value, now reset to orig. nonzero value):
+                  <ul dir="auto">
+                    <li><code>gas_refund += 2800</code></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">A8: LOG* Operations</h2><a id="user-content-a8-log-operations"
+      class="anchor" aria-label="Permalink: A8: LOG* Operations" href="#a8-log-operations"><svg
+        class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Note that for <code>LOG*</code> operations gas is paid per byte of data (not per word).</p>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>num_topics</code>: the * of the LOG* op. e.g. LOG0 has <code>num_topics = 0</code>, LOG4 has
+      <code>num_topics = 4</code></li>
+    <li><code>data_size</code>: size of the data to log in bytes (<code>len</code> in the stack representation).</li>
+    <li><code>mem_expansion_cost</code>: the cost of any memory expansion required (see <a
+        href="#a0-1-memory-expansion">A0-1</a>)</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = 375 + 375 * num_topics + 8 * data_size + mem_expansion_cost</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">A9: CREATE* Operations</h2><a
+      id="user-content-a9-create-operations" class="anchor" aria-label="Permalink: A9: CREATE* Operations"
+      href="#a9-create-operations"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16"
+        height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Common Terms:</p>
+  <ul dir="auto">
+    <li><code>mem_expansion_cost</code>: the cost of any memory expansion required (see <a
+        href="#a0-1-memory-expansion">A0-1</a>)</li>
+    <li><code>code_deposit_cost</code>: the per-byte cost incurred for storing the deployed code (see <a
+        href="#a9-f-code-deposit-cost">A9-F</a>).</li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">A9-1: CREATE</h3><a id="user-content-a9-1-create"
+      class="anchor" aria-label="Permalink: A9-1: CREATE" href="#a9-1-create"><svg class="octicon octicon-link"
+        viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = 32000 + mem_expansion_cost + code_deposit_cost</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">A9-2: CREATE2</h3><a id="user-content-a9-2-create2"
+      class="anchor" aria-label="Permalink: A9-2: CREATE2" href="#a9-2-create2"><svg class="octicon octicon-link"
+        viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto"><code>CREATE2</code> incurs an additional dynamic cost over <code>CREATE</code> because of the need to
+    hash the init code.</p>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>data_size</code>: size of the init code in bytes (<code>len</code> in the stack representation)</li>
+    <li><code>data_size_words = (data_size + 31) // 32</code>: number of (32-byte) words in the init code</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = 32000 + 6 * data_size_words + mem_expansion_cost + code_deposit_cost</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">A9-F: Code Deposit Cost</h3><a
+      id="user-content-a9-f-code-deposit-cost" class="anchor" aria-label="Permalink: A9-F: Code Deposit Cost"
+      href="#a9-f-code-deposit-cost"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16"
+        height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">In addition to the static and dynamic cost of the <code>CREATE</code> and <code>CREATE2</code>
+    operations, a per-byte cost is charged for storing the returned runtime code.
+    Unlike the static and dynamic costs of the opcodes, this cost is not applied until <em>after</em> the execution of
+    the initialization code halts.</p>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>returned_code_size</code>: the length of the returned runtime code</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>code_deposit_cost = 200 * returned_code_size</code></li>
+  </ul>
+  <p dir="auto">A note related to the code deposit step of contract creation:
+    As of <a href="https://eips.ethereum.org/EIPS/eip-3541" rel="nofollow">EIP-3541</a>, any code returned from a
+    contract creation (i.e. what <em>would</em> become the deployed contract code), results in an exceptional abort of
+    the entire contract creation if the code's first byte is <code>0xEF</code>.</p>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">AA: CALL* Operations</h2><a
+      id="user-content-aa-call-operations" class="anchor" aria-label="Permalink: AA: CALL* Operations"
+      href="#aa-call-operations"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16"
+        height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Gas costs for <code>CALL</code>, <code>CALLCODE</code>, <code>DELEGATECALL</code>, and
+    <code>STATICCALL</code> operations.
+    A big piece of the gas calculation for these operations is determining the gas to send along with the call.
+    There's a good chance that you are primarily interested in the <code>base_cost</code> and can ignore this additional
+    calculation, because the <code>gas_sent_with_call</code> is consumed in the context of the called contract, and the
+    unconsumed gas is returned.
+    If not, see the <code>gas_sent_with_call</code> <a href="#aa-f-gas-to-send-with-call-operations">section</a>.</p>
+  <p dir="auto">Similar to selfdestruct, <code>CALL</code> incurs an additional cost if it forces an account to be added
+    to the state trie by sending a nonzero amount of eth to an address that was previously empty.
+    "Empty", in this case is defined according to <a href="https://eips.ethereum.org/EIPS/eip-161"
+      rel="nofollow">EIP-161</a> (<code>balance == nonce == code == 0x</code>).</p>
+  <p dir="auto">Common Terms:</p>
+  <ul dir="auto">
+    <li><code>call_value</code>: the value sent with the call (<code>val</code> in the stack representation)</li>
+    <li><code>target_addr</code>: the recipient of the call (<code>addr</code> in the stack representation)</li>
+    <li><code>access_cost</code>: The cost of accessing a warm vs. cold account (see <a
+        href="#a0-2-access-sets">A0-2</a>)
+      <ul dir="auto">
+        <li><code>access_cost = 100</code> <strong>if</strong> <code>target_addr</code> <strong>in</strong>
+          <code>touched_addresses</code> (warm access)</li>
+        <li><code>access_cost = 2600</code> <strong>if</strong> <code>target_addr</code> <strong>not in</strong>
+          <code>touched_addresses</code> (cold access)</li>
+      </ul>
+    </li>
+    <li><code>mem_expansion_cost</code>: the cost of any memory expansion required (see <a
+        href="#a0-1-memory-expansion">A0-1</a>)</li>
+    <li><code>gas_sent_with_call</code>: the gas ultimately sent with the call</li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">AA-1: CALL</h3><a id="user-content-aa-1-call" class="anchor"
+      aria-label="Permalink: AA-1: CALL" href="#aa-1-call"><svg class="octicon octicon-link" viewBox="0 0 16 16"
+        version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>base_gas = access_cost + mem_expansion_cost</code></li>
+    <li><strong>If</strong> <code>call_value &gt; 0</code> (sending value with call):
+      <ul dir="auto">
+        <li><code>base_gas += 9000</code></li>
+        <li><strong>If</strong> <code>is_empty(target_addr)</code> (forcing a new account to be created in the state
+          trie):
+          <ul dir="auto">
+            <li><code>base_gas += 25000</code></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <p dir="auto">Calculate the <code>gas_sent_with_call</code> <a
+      href="#aa-f-gas-to-send-with-call-operations">below</a>.</p>
+  <p dir="auto">And the final cost of the operation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = base_gas + gas_sent_with_call</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">AA-2: CALLCODE</h3><a id="user-content-aa-2-callcode"
+      class="anchor" aria-label="Permalink: AA-2: CALLCODE" href="#aa-2-callcode"><svg class="octicon octicon-link"
+        viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>base_gas = access_cost + mem_expansion_cost</code></li>
+    <li><strong>If</strong> <code>call_value &gt; 0</code> (sending value with call):
+      <ul dir="auto">
+        <li><code>base_gas += 9000</code></li>
+      </ul>
+    </li>
+  </ul>
+  <p dir="auto">Calculate the <code>gas_sent_with_call</code> <a
+      href="#aa-f-gas-to-send-with-call-operations">below</a>.</p>
+  <p dir="auto">And the final cost of the operation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = base_gas + gas_sent_with_call</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">AA-3: DELEGATECALL</h3><a id="user-content-aa-3-delegatecall"
+      class="anchor" aria-label="Permalink: AA-3: DELEGATECALL" href="#aa-3-delegatecall"><svg
+        class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>base_gas = access_cost + mem_expansion_cost</code></li>
+  </ul>
+  <p dir="auto">Calculate the <code>gas_sent_with_call</code> <a
+      href="#aa-f-gas-to-send-with-call-operations">below</a>.</p>
+  <p dir="auto">And the final cost of the operation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = base_gas + gas_sent_with_call</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">AA-4: STATICCALL</h3><a id="user-content-aa-4-staticcall"
+      class="anchor" aria-label="Permalink: AA-4: STATICCALL" href="#aa-4-staticcall"><svg class="octicon octicon-link"
+        viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>base_gas = access_cost + mem_expansion_cost</code></li>
+  </ul>
+  <p dir="auto">Calculate the <code>gas_sent_with_call</code> <a
+      href="#aa-f-gas-to-send-with-call-operations">below</a>.</p>
+  <p dir="auto">And the final cost of the operation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = base_gas + gas_sent_with_call</code></li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h3 tabindex="-1" class="heading-element" dir="auto">AA-F: Gas to Send with CALL Operations</h3><a
+      id="user-content-aa-f-gas-to-send-with-call-operations" class="anchor"
+      aria-label="Permalink: AA-F: Gas to Send with CALL Operations" href="#aa-f-gas-to-send-with-call-operations"><svg
+        class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">In addition to the base cost of executing the operation, <code>CALL</code>, <code>CALLCODE</code>,
+    <code>DELEGATECALL</code>, and <code>STATICCALL</code> need to determine how much gas to send along with the call.
+    Much of the complexity here comes from a backward-compatible change made in <a
+      href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-150.md">EIP-150</a>.
+    Here's an overview of why this calculation is used:</p>
+  <p dir="auto">EIP-150 increased the <code>base_cost</code> of the <code>CALL</code> opcode from 40 to 700 gas, but
+    most contracts in use at the time were sending <code>available_gas - 40</code> with every call.
+    So, when <code>base_cost</code> increased, these contracts were suddenly trying to send more gas than they had left
+    (<code>requested_gas &gt; remaining_gas</code>).
+    To avoid breaking these contracts, if the <code>requested_gas</code> is more than <code>remaining_gas</code>, we
+    send <code>all_but_one_64th</code> of <code>remaining_gas</code> instead of trying to send
+    <code>requested_gas</code>, which would result in an <code>OUT_OF_GAS_ERROR</code>.</p>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>base_gas</code>: the cost of the operation before taking into account the gas that should be sent along
+      with the call.
+      See <a href="#aa-call-operations">AA</a> for this calculation.</li>
+    <li><code>available_gas</code>: the gas remaining in the current execution context immediately before the execution
+      of the opcode</li>
+    <li><code>remaining_gas</code>: the gas remaining after deducting <code>base_cost</code> of the op but before
+      deducting <code>gas_sent_with_call</code></li>
+    <li><code>requested_gas</code>: the gas requested to be sent with the call (<code>gas</code> in the stack
+      representation)</li>
+    <li><code>all_but_one_64th</code>: All but floor(1/64) of the remaining gas</li>
+    <li><code>gas_sent_with_call</code>: the gas ultimately sent with the call</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>remaining_gas = available_gas - base_gas</code></li>
+    <li><code>all_but_one_64th = remaining_gas - (remaining_gas // 64)</code></li>
+    <li><code>gas_sent_with_call = min(requested_gas, all_but_one_64th)</code></li>
+  </ul>
+  <p dir="auto">Any portion of <code>gas_sent_with_call</code> that is not used by the recipient of the call is refunded
+    to the caller after the call returns. Also, if <code>call_value &gt; 0</code>, a 2300 gas stipend is added to the
+    amount of gas included in the call, but not to the cost of making the call.</p>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">AB: SELFDESTRUCT</h2><a id="user-content-ab-selfdestruct"
+      class="anchor" aria-label="Permalink: AB: SELFDESTRUCT" href="#ab-selfdestruct"><svg class="octicon octicon-link"
+        viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">The gas cost of a <code>SELFDESTRUCT</code> operation is dependent on whether or not the operation
+    results in a new account being added to the state trie.
+    If a nonzero amount of eth is sent to an address that was previously empty, an additional cost is incurred.
+    "Empty", in this case is defined according to <a href="https://eips.ethereum.org/EIPS/eip-161"
+      rel="nofollow">EIP-161</a> (<code>balance == nonce == code == 0x</code>).</p>
+  <p dir="auto">The cost also increases if the operation requires a cold access of the recipient address.
+    See <a href="#a0-2-access-sets">A0-2</a> for details on EIP-2929 and <code>touched_addresses</code>.</p>
+  <p dir="auto">Terms:</p>
+  <ul dir="auto">
+    <li><code>target_addr</code>: the recipient of the self-destructing contract's funds (<code>addr</code> in the stack
+      representation)</li>
+    <li><code>context_addr</code>: the address of the current execution context (i.e. what <code>ADDRESS</code> would
+      put on the stack)</li>
+  </ul>
+  <p dir="auto">Gas Calculation:</p>
+  <ul dir="auto">
+    <li><code>gas_cost = 5000</code>: base cost</li>
+    <li><strong>If</strong> <code>balance(context_addr) &gt; 0 &amp;&amp; is_empty(target_addr)</code> (sending funds to
+      a previously empty address):
+      <ul dir="auto">
+        <li><code>gas_cost += 25000</code></li>
+      </ul>
+    </li>
+    <li><strong>If</strong> <code>target_addr</code> <strong>not in</strong> <code>touched_addresses</code> (cold
+      access):
+      <ul dir="auto">
+        <li><code>gas_cost += 2600</code></li>
+      </ul>
+    </li>
+  </ul>
+  <div class="markdown-heading" dir="auto">
+    <h2 tabindex="-1" class="heading-element" dir="auto">AF: INVALID</h2><a id="user-content-af-invalid" class="anchor"
+      aria-label="Permalink: AF: INVALID" href="#af-invalid"><svg class="octicon octicon-link" viewBox="0 0 16 16"
+        version="1.1" width="16" height="16" aria-hidden="true">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z">
+        </path>
+      </svg></a>
+  </div>
+  <p dir="auto">On execution of any invalid operation, whether the designated <code>INVALID</code> opcode or simply an
+    undefined opcode, all remaining gas is consumed and the state is reverted to the point immediately prior to the
+    beginning of the current execution context.</p>
+</article>

@@ -1,0 +1,1678 @@
+<h3 id="terraform"><a class="anchorjs-link " href="#terraform" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>terraform
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">terraform</code> block is used to configure how Terragrunt
+  will interact with Terraform. This includes specifying where
+  to find the Terraform configuration files, any extra arguments to pass to the <code
+    class=" highlighter-rouge language-plaintext">terraform</code> CLI, and any hooks to run
+  before or after calling Terraform.</p>
+
+<p>The <code class=" highlighter-rouge language-plaintext">terraform</code> block supports the following arguments:
+</p>
+
+<ul>
+  <li>
+    <p><code class=" highlighter-rouge language-plaintext">source</code> (attribute): Specifies where to find
+      Terraform configuration files. This parameter supports the exact same syntax as the
+      <a href="https://www.terraform.io/docs/modules/sources.html">module source</a> parameter for Terraform <code
+        class=" highlighter-rouge language-plaintext">module</code> blocks <strong>except
+        for the Terraform registry</strong> (see below note), including local file paths, Git URLs, and Git URLS with
+      <code class=" highlighter-rouge language-plaintext">ref</code>
+      parameters. Terragrunt will download all the code in the repo (i.e. the part before the double-slash <code
+        class=" highlighter-rouge language-plaintext">//</code>) so that
+      relative paths work correctly between modules in that repo.
+    </p>
+
+    <ul>
+      <li>The <code class=" highlighter-rouge language-plaintext">source</code> parameter can be configured to pull
+        Terraform modules from any Terraform module registry using
+        the <code class=" highlighter-rouge language-plaintext">tfr</code> protocol. The <code
+          class=" highlighter-rouge language-plaintext">tfr</code> protocol expects URLs to be provided in the format
+        <code class=" highlighter-rouge language-plaintext">tfr://REGISTRY_HOST/MODULE_SOURCE?version=VERSION</code>.
+        For example, to pull the <code
+          class=" highlighter-rouge language-plaintext">terraform-aws-modules/vpc/aws</code>
+        module from the public Terraform registry, you can use the following as the source parameter:
+        <code
+          class=" highlighter-rouge language-plaintext">tfr://registry.terraform.io/terraform-aws-modules/vpc/aws?version=3.3.0</code>.
+      </li>
+      <li>If you wish to access a private module registry (e.g., <a
+          href="https://www.terraform.io/docs/cloud/registry/index.html">Terraform Cloud/Enterprise</a>),
+        you can provide the authentication to Terragrunt as an environment variable with the key <code
+          class=" highlighter-rouge language-plaintext">TG_TF_REGISTRY_TOKEN</code>.
+        This token can be any registry API token.</li>
+      <li>The <code class=" highlighter-rouge language-plaintext">tfr</code> protocol supports a shorthand notation
+        where the <code class=" highlighter-rouge language-plaintext">REGISTRY_HOST</code> can be omitted to default
+        to the public
+        registry. The default registry depends on the wrapped executable: for Terraform, it is <code
+          class=" highlighter-rouge language-plaintext">registry.terraform.io</code>,
+        and for Opentofu, it is <code class=" highlighter-rouge language-plaintext">registry.opentofu.org</code>.
+        Additionally, if the environment variable <code
+          class=" highlighter-rouge language-plaintext">TG_TF_DEFAULT_REGISTRY_HOST</code>
+        is set, this value will be used as the default registry host instead, overriding the standard defaults for the
+        wrapped executable.</li>
+      <li>If you use <code class=" highlighter-rouge language-plaintext">tfr:///</code> (note the three <code
+          class=" highlighter-rouge language-plaintext">/</code>). For example, the following will
+        fetch the <code class=" highlighter-rouge language-plaintext">terraform-aws-modules/vpc/aws</code> module from
+        the public registry:
+        <code class=" highlighter-rouge language-plaintext">tfr:///terraform-aws-modules/vpc/aws?version=3.3.0</code>.
+      </li>
+      <li>You can also use submodules from the registry using <code
+          class=" highlighter-rouge language-plaintext">//</code>. For example, to use the <code
+          class=" highlighter-rouge language-plaintext">iam-policy</code> submodule from the
+        registry module
+        <a
+          href="https://registry.terraform.io/modules/terraform-aws-modules/iam/aws/latest">terraform-aws-modules/iam</a>,
+        you can
+        use the following: <code
+          class=" highlighter-rouge language-plaintext">tfr:///terraform-aws-modules/iam/aws//modules/iam-policy?version=4.3.0</code>.
+      </li>
+      <li>Refer to <a href="/docs/getting-started/quick-start#a-note-about-using-modules-from-the-registry">A note
+          about using modules from the
+          registry</a> for more
+        information about using modules from the Terraform Registry with Terragrunt.</li>
+    </ul>
+  </li>
+  <li>
+    <p><code class=" highlighter-rouge language-plaintext">include_in_copy</code> (attribute): A list of glob patterns
+      (e.g., <code class=" highlighter-rouge language-plaintext">["*.txt"]</code>) that should always be copied into
+      the
+      Terraform working directory. When you use the <code class=" highlighter-rouge language-plaintext">source</code>
+      param in your Terragrunt config and run <code
+        class=" highlighter-rouge language-plaintext">terragrunt &lt;command&gt;</code>,
+      Terragrunt will download the code specified at source into a scratch folder (<code
+        class=" highlighter-rouge language-plaintext">.terragrunt-cache</code>, by default), copy
+      the code in your current working directory into the same scratch folder, and then run <code
+        class=" highlighter-rouge language-plaintext">terraform &lt;command&gt;</code> in that
+      scratch folder. By default, Terragrunt excludes hidden files and folders during the copy step. This feature
+      allows you
+      to specify glob patterns of files that should always be copied from the Terragrunt working directory. Additional
+      notes:</p>
+
+    <ul>
+      <li>The path should be specified relative to the source directory.</li>
+      <li>This list is also used when using a local file source (e.g., <code
+          class=" highlighter-rouge language-plaintext">source = "../modules/vpc"</code>). For example, if your
+        terraform module source contains a hidden file that you want to copy over (e.g., a <code
+          class=" highlighter-rouge language-plaintext">.python-version</code> file), you
+        can specify that in this list to ensure it gets copied over to the scratch copy
+        (e.g., <code class=" highlighter-rouge language-plaintext">include_in_copy = [".python-version"]</code>).</li>
+    </ul>
+  </li>
+  <li>
+    <p><code class=" highlighter-rouge language-plaintext">extra_arguments</code> (block): Nested blocks used to
+      specify extra CLI arguments to pass to the <code class=" highlighter-rouge language-plaintext">terraform</code>
+      CLI. Learn more
+      about its usage in the <a href="/docs/features/keep-your-cli-flags-dry/">Keep your CLI flags DRY</a> use case
+      overview. Supports
+      the following arguments:</p>
+
+    <ul>
+      <li><code class=" highlighter-rouge language-plaintext">arguments</code> (required) : A list of CLI arguments to
+        pass to <code class=" highlighter-rouge language-plaintext">terraform</code>.</li>
+      <li><code class=" highlighter-rouge language-plaintext">commands</code> (required) : A list of <code
+          class=" highlighter-rouge language-plaintext">terraform</code> sub commands that the arguments will be
+        passed to.</li>
+      <li><code class=" highlighter-rouge language-plaintext">env_vars</code> (optional) : A map of key value pairs to
+        set as environment variables when calling <code class=" highlighter-rouge language-plaintext">terraform</code>.
+      </li>
+      <li><code class=" highlighter-rouge language-plaintext">required_var_files</code> (optional): A list of file
+        paths to terraform vars files (<code class=" highlighter-rouge language-plaintext">.tfvars</code>) that will
+        be passed in to
+        <code class=" highlighter-rouge language-plaintext">terraform</code> as <code
+          class=" highlighter-rouge language-plaintext">-var-file=&lt;your file&gt;</code>.
+      </li>
+      <li><code class=" highlighter-rouge language-plaintext">optional_var_files</code> (optional): A list of file
+        paths to terraform vars files (<code class=" highlighter-rouge language-plaintext">.tfvars</code>) that will
+        be passed in to
+        <code class=" highlighter-rouge language-plaintext">terraform</code> like <code
+          class=" highlighter-rouge language-plaintext">required_var_files</code>, only any files that do not exist
+        are ignored.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><code class=" highlighter-rouge language-plaintext">before_hook</code> (block): Nested blocks used to specify
+      command hooks that should be run before <code class=" highlighter-rouge language-plaintext">terraform</code> is
+      called.
+      Hooks run from the directory with the terraform module, except for hooks related to <code
+        class=" highlighter-rouge language-plaintext">terragrunt-read-config</code> and
+      <code class=" highlighter-rouge language-plaintext">init-from-module</code>. These hooks run in the terragrunt
+      configuration directory (the directory where <code
+        class=" highlighter-rouge language-plaintext">terragrunt.hcl</code>
+      lives).
+      Supports the following arguments:
+    </p>
+
+    <ul>
+      <li><code class=" highlighter-rouge language-plaintext">commands</code> (required) : A list of <code
+          class=" highlighter-rouge language-plaintext">terraform</code> sub commands for which the hook should run
+        before.</li>
+      <li><code class=" highlighter-rouge language-plaintext">execute</code> (required) : A list of command and
+        arguments that should be run as the hook. For example, if <code
+          class=" highlighter-rouge language-plaintext">execute</code> is set as
+        <code class=" highlighter-rouge language-plaintext">["echo", "Foo"]</code>, the command <code
+          class=" highlighter-rouge language-plaintext">echo Foo</code> will be run.
+      </li>
+      <li><code class=" highlighter-rouge language-plaintext">working_dir</code> (optional) : The path to set as the
+        working directory of the hook. Terragrunt will switch directory
+        to this path prior to running the hook command. Defaults to the terragrunt configuration directory for
+        <code class=" highlighter-rouge language-plaintext">terragrunt-read-config</code> and <code
+          class=" highlighter-rouge language-plaintext">init-from-module</code> hooks, and the terraform module
+        directory for other command hooks.
+      </li>
+      <li><code class=" highlighter-rouge language-plaintext">run_on_error</code> (optional) : If set to true, this
+        hook will run even if a previous hook hit an error, or in the
+        case of “after” hooks, if the Terraform command hit an error. Default is false.</li>
+      <li><code class=" highlighter-rouge language-plaintext">suppress_stdout</code> (optional) : If set to true, the
+        stdout output of the executed commands will be suppressed. This can be useful when there are scripts relying
+        on terraform’s output and any other output would break their parsing.</li>
+    </ul>
+  </li>
+  <li><code class=" highlighter-rouge language-plaintext">after_hook</code> (block): Nested blocks used to specify
+    command hooks that should be run after <code class=" highlighter-rouge language-plaintext">terraform</code> is
+    called.
+    Hooks run from the terragrunt configuration directory (the directory where <code
+      class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> lives). Supports the same
+    arguments as <code class=" highlighter-rouge language-plaintext">before_hook</code>.</li>
+  <li><code class=" highlighter-rouge language-plaintext">error_hook</code> (block): Nested blocks used to specify
+    command hooks that run when an error is thrown. The
+    error must match one of the expressions listed in the <code
+      class=" highlighter-rouge language-plaintext">on_errors</code> attribute. Error hooks are executed after the
+    before/after hooks.</li>
+</ul>
+
+<p>In addition to supporting before and after hooks for all terraform commands, the following specialized hooks are
+  also
+  supported:</p>
+
+<ul>
+  <li>
+    <p><code class=" highlighter-rouge language-plaintext">terragrunt-read-config</code> (after hook only): <code
+        class=" highlighter-rouge language-plaintext">terragrunt-read-config</code> is a special hook command that you
+      can use with
+      the <code class=" highlighter-rouge language-plaintext">after_hook</code> subblock to run an action immediately
+      after terragrunt finishes loading the config. This hook will
+      run on every invocation of terragrunt. Note that you can only use this hook with <code
+        class=" highlighter-rouge language-plaintext">after_hooks</code>. Any <code
+        class=" highlighter-rouge language-plaintext">before_hooks</code>
+      with the command <code class=" highlighter-rouge language-plaintext">terragrunt-read-config</code> will be
+      ignored. The working directory for hooks associated with this
+      command will be the terragrunt config directory.</p>
+  </li>
+  <li>
+    <p><code class=" highlighter-rouge language-plaintext">init-from-module</code> and <code
+        class=" highlighter-rouge language-plaintext">init</code>: Terragrunt has two stages of initialization: one is
+      to download <a href="https://terragrunt.gruntwork.io/use-cases/keep-your-terraform-code-dry/">remote
+        configurations</a> using <code class=" highlighter-rouge language-plaintext">go-getter</code>; the other
+      is <a href="https://terragrunt.gruntwork.io/docs/features/auto-init/">Auto-Init</a>, which configures the
+      backend and downloads
+      provider plugins and modules. If you wish to run a hook when Terragrunt is using <code
+        class=" highlighter-rouge language-plaintext">go-getter</code> to download remote
+      configurations, use <code class=" highlighter-rouge language-plaintext">init-from-module</code> for the command.
+      If you wish to execute a hook when Terragrunt is using
+      terraform <code class=" highlighter-rouge language-plaintext">init</code> for Auto-Init, use <code
+        class=" highlighter-rouge language-plaintext">init</code> for the command. For example, an <code
+        class=" highlighter-rouge language-plaintext">after_hook</code> for the command
+      <code class=" highlighter-rouge language-plaintext">init-from-module</code> will run after terragrunt clones the
+      module, while an <code class=" highlighter-rouge language-plaintext">after_hook</code> for the command <code
+        class=" highlighter-rouge language-plaintext">init</code> will run
+      after terragrunt runs <code class=" highlighter-rouge language-plaintext">terraform init</code> on the cloned
+      module.
+    </p>
+    <ul>
+      <li>Hooks for both <code class=" highlighter-rouge language-plaintext">init-from-module</code> and <code
+          class=" highlighter-rouge language-plaintext">init</code> only run if the requisite stage needs to run. That
+        is, if terragrunt
+        detects that the module is already cloned in the terragrunt cache, this stage will be skipped and thus the
+        hooks
+        will not run. Similarly, if terragrunt detects that it does not need to run <code
+          class=" highlighter-rouge language-plaintext">init</code> in the auto init feature, the
+        <code class=" highlighter-rouge language-plaintext">init</code> stage is skipped along with the related hooks.
+      </li>
+      <li>The working directory for hooks associated with <code
+          class=" highlighter-rouge language-plaintext">init-from-module</code> will run in the terragrunt config
+        directory,
+        while the working directory for hooks associated with <code
+          class=" highlighter-rouge language-plaintext">init</code> will be the terraform module.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Complete Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token keyword">terraform</span> <span class="token punctuation">{</span>
+  <span class="token comment"># Pull the terraform configuration at the github repo "acme/infrastructure-modules", under the subdirectory</span>
+  <span class="token comment"># "networking/vpc", using the git tag "v0.0.1".</span>
+  <span class="token property">source</span> <span class="token punctuation">=</span> <span class="token string">"git::git@github.com:acme/infrastructure-modules.git//networking/vpc?ref=v0.0.1"</span>
+
+  <span class="token comment"># For any terraform commands that use locking, make sure to configure a lock timeout of 20 minutes.</span>
+  extra_arguments <span class="token string">"retry_lock"</span> <span class="token punctuation">{</span>
+    <span class="token property">commands</span>  <span class="token punctuation">=</span> get_terraform_commands_that_need_locking()
+    <span class="token property">arguments</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"-lock-timeout=20m"</span><span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment"># You can also specify multiple extra arguments for each use case. Here we configure terragrunt to always pass in the</span>
+  <span class="token comment"># `common.tfvars` var file located by the parent terragrunt config.</span>
+  extra_arguments <span class="token string">"custom_vars"</span> <span class="token punctuation">{</span>
+    <span class="token property">commands</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span>
+      <span class="token string">"apply"</span>,
+      <span class="token string">"plan"</span>,
+      <span class="token string">"import"</span>,
+      <span class="token string">"push"</span>,
+      <span class="token string">"refresh"</span>
+    <span class="token punctuation">]</span>
+
+    <span class="token property">required_var_files</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"<span class="token interpolation"><span class="token punctuation">$</span><span class="token punctuation">{</span><span class="token function">get_parent_terragrunt_dir</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span>/common.tfvars"</span><span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment"># The following are examples of how to specify hooks</span>
+
+  <span class="token comment"># Before apply or plan, run "echo Foo".</span>
+  before_hook <span class="token string">"before_hook_1"</span> <span class="token punctuation">{</span>
+    <span class="token property">commands</span>     <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"apply"</span>, <span class="token string">"plan"</span><span class="token punctuation">]</span>
+    <span class="token property">execute</span>      <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"echo"</span>, <span class="token string">"Foo"</span><span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment"># Before apply, run "echo Bar". Note that blocks are ordered, so this hook will run after the previous hook to</span>
+  <span class="token comment"># "echo Foo". In this case, always "echo Bar" even if the previous hook failed.</span>
+  before_hook <span class="token string">"before_hook_2"</span> <span class="token punctuation">{</span>
+    <span class="token property">commands</span>     <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"apply"</span><span class="token punctuation">]</span>
+    <span class="token property">execute</span>      <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"echo"</span>, <span class="token string">"Bar"</span><span class="token punctuation">]</span>
+    <span class="token property">run_on_error</span> <span class="token punctuation">=</span> <span class="token boolean">true</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment"># Note that you can use interpolations in subblocks. Here, we configure it so that before apply or plan, print out the</span>
+  <span class="token comment"># environment variable "HOME".</span>
+  before_hook <span class="token string">"interpolation_hook_1"</span> <span class="token punctuation">{</span>
+    <span class="token property">commands</span>     <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"apply"</span>, <span class="token string">"plan"</span><span class="token punctuation">]</span>
+    <span class="token property">execute</span>      <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"echo"</span>, get_env(<span class="token string">"HOME"</span>, <span class="token string">"HelloWorld"</span>)<span class="token punctuation">]</span>
+    <span class="token property">run_on_error</span> <span class="token punctuation">=</span> <span class="token boolean">false</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment"># After running apply or plan, run "echo Baz". This hook is configured so that it will always run, even if the apply</span>
+  <span class="token comment"># or plan failed.</span>
+  after_hook <span class="token string">"after_hook_1"</span> <span class="token punctuation">{</span>
+    <span class="token property">commands</span>     <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"apply"</span>, <span class="token string">"plan"</span><span class="token punctuation">]</span>
+    <span class="token property">execute</span>      <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"echo"</span>, <span class="token string">"Baz"</span><span class="token punctuation">]</span>
+    <span class="token property">run_on_error</span> <span class="token punctuation">=</span> <span class="token boolean">true</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment"># After an error occurs during apply or plan, run "echo Error Hook executed". This hook is configured so that it will run</span>
+  <span class="token comment"># after any error, with the ".*" expression.</span>
+  error_hook <span class="token string">"error_hook_1"</span> <span class="token punctuation">{</span>
+    <span class="token property">commands</span>  <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"apply"</span>, <span class="token string">"plan"</span><span class="token punctuation">]</span>
+    <span class="token property">execute</span>   <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"echo"</span>, <span class="token string">"Error Hook executed"</span><span class="token punctuation">]</span>
+    <span class="token property">on_errors</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span>
+      <span class="token string">".*"</span>,
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment"># A special after hook to always run after the init-from-module step of the Terragrunt pipeline. In this case, we will</span>
+  <span class="token comment"># copy the "foo.tf" file located by the parent terragrunt.hcl file to the current working directory.</span>
+  after_hook <span class="token string">"init_from_module"</span> <span class="token punctuation">{</span>
+    <span class="token property">commands</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"init-from-module"</span><span class="token punctuation">]</span>
+    <span class="token property">execute</span>  <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"cp"</span>, <span class="token string">"<span class="token interpolation"><span class="token punctuation">$</span><span class="token punctuation">{</span><span class="token function">get_parent_terragrunt_dir</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span>/foo.tf"</span>, <span class="token string">"."</span><span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment"># A special after_hook. Use this hook if you wish to run commands immediately after terragrunt finishes loading its</span>
+  <span class="token comment"># configurations. If "terragrunt-read-config" is defined as a before_hook, it will be ignored as this config would</span>
+  <span class="token comment"># not be loaded before the action is done.</span>
+  after_hook <span class="token string">"terragrunt-read-config"</span> <span class="token punctuation">{</span>
+    <span class="token property">commands</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"terragrunt-read-config"</span><span class="token punctuation">]</span>
+    <span class="token property">execute</span>  <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"bash"</span>, <span class="token string">"script/get_aws_credentials.sh"</span><span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<p>Local File Path Example with allowed hidden files:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token keyword">terraform</span> <span class="token punctuation">{</span>
+  <span class="token comment"># Pull the terraform configuration from the local file system. Terragrunt will make a copy of the source folder in the</span>
+  <span class="token comment"># Terragrunt working directory (typically `.terragrunt-cache`).</span>
+  <span class="token property">source</span> <span class="token punctuation">=</span> <span class="token string">"../modules/networking/vpc"</span>
+
+  <span class="token comment"># Always include the following file patterns in the Terragrunt copy.</span>
+  <span class="token property">include_in_copy</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span>
+    <span class="token string">".security_group_rules.json"</span>,
+    <span class="token string">"*.yaml"</span>,
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<h4 id="a-note-about-using-modules-from-the-registry"><a class="anchorjs-link "
+    href="#a-note-about-using-modules-from-the-registry" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>A
+  note about using modules from the registry</h4>
+
+<p>The key design of Terragrunt is to act as a preprocessor to convert <strong>shared service modules</strong> in the
+  registry into a <strong>root
+    module</strong>. In Terraform, modules can be loosely categorized into two types:</p>
+
+<ul>
+  <li><strong>Root Module</strong>: A Terraform module that is designed for running <code
+      class=" highlighter-rouge language-plaintext">terraform init</code> and the other workflow commands
+    (<code class=" highlighter-rouge language-plaintext">apply</code>, <code
+      class=" highlighter-rouge language-plaintext">plan</code>, etc). This is the entrypoint module for deploying
+    your infrastructure. Root modules are identified
+    by the presence of key blocks that setup configuration about how Terraform behaves, like <code
+      class=" highlighter-rouge language-plaintext">backend</code> blocks (for
+    configuring state) and <code class=" highlighter-rouge language-plaintext">provider</code> blocks (for configuring
+    how Terraform interacts with the cloud APIs).</li>
+  <li><strong>Shared Module</strong>: A Terraform module that is designed to be included in other Terraform modules
+    through <code class=" highlighter-rouge language-plaintext">module</code>
+    blocks. These modules are missing many of the key blocks that are required for running the workflow commands of
+    terraform.</li>
+</ul>
+
+<p>Terragrunt further distinguishes shared modules between <strong>service modules</strong> and
+  <strong>modules</strong>:
+</p>
+
+<ul>
+  <li><strong>Shared Service Module</strong>: A Terraform module that is designed to be standalone and applied
+    directly. These modules
+    are not root modules in that they are still missing the key blocks like <code
+      class=" highlighter-rouge language-plaintext">backend</code> and <code
+      class=" highlighter-rouge language-plaintext">provider</code>, but aside from that
+    do not need any additional configuration or composition to deploy. For example, the
+    <a href="https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest">terraform-aws-modules/vpc</a>
+    module can be
+    deployed by itself without composing with other modules or resources.
+  </li>
+  <li><strong>Shared Module</strong>: A Terraform module that is designed to be composed with other modules. That is,
+    these modules must
+    be embedded in another Terraform module and combined with other resources or modules. For example, the
+    <a href="https://registry.terraform.io/modules/hashicorp/consul/aws/latest/submodules/consul-security-group-rules">consul-security-group-rules
+      module</a>
+  </li>
+</ul>
+
+<p>Terragrunt started off with features that help directly deploy <strong>Root Modules</strong>, but over the years
+  have implemented
+  many features that allow you to turn <strong>Shared Service Modules</strong> into <strong>Root Modules</strong> by
+  injecting the key configuration
+  blocks that are necessary for Terraform modules to act as <strong>Root Modules</strong>.</p>
+
+<p>Modules on the Terraform Registry are primarily designed to be used as <strong>Shared Modules</strong>. That is,
+  you won’t be able to
+  <code class=" highlighter-rouge language-plaintext">git clone</code> the underlying repository and run <code
+    class=" highlighter-rouge language-plaintext">terraform init</code> or <code
+    class=" highlighter-rouge language-plaintext">apply</code> directly on the module without modification.
+  Unless otherwise specified, almost all the modules will require composition with other modules/resources to deploy.
+  When using modules in the registry, it helps to think about what blocks and resources are necessary to operate the
+  module, and translating those into Terragrunt blocks that generate them.
+</p>
+
+<p>Note that in many cases, Terragrunt may not be able to deploy modules from the registry. While Terragrunt has
+  features
+  to turn any <strong>Shared Module</strong> into a <strong>Root Module</strong>, there are two key technical
+  limitations that prevent Terragrunt
+  from converting ALL shared modules:</p>
+
+<ul>
+  <li>Every complex input must have a <code class=" highlighter-rouge language-plaintext">type</code> associated with
+    it. Otherwise, Terraform will interpret the input that
+    Terragrunt passes through as <code class=" highlighter-rouge language-plaintext">string</code>. This includes
+    <code class=" highlighter-rouge language-plaintext">list</code> and <code
+      class=" highlighter-rouge language-plaintext">map</code>.
+  </li>
+  <li>Derived sensitive outputs must be marked as <code class=" highlighter-rouge language-plaintext">sensitive</code>.
+    Refer to the <a
+      href="https://learn.hashicorp.com/tutorials/terraform/sensitive-variables#reference-sensitive-variables">terraform
+      tutorial on sensitive
+      variables</a> for more
+    information on this requirement.</li>
+</ul>
+
+<p><strong>If you run into issues deploying a module from the registry, chances are that module is not a Shared
+    Service Module,
+    and thus not designed for use with Terragrunt. Depending on the technical limitation, Terragrunt may be able to
+    support the transition to root module. Please always file <a
+      href="https://github.com/gruntwork-io/terragrunt/issues">an issue on the terragrunt
+      repository</a> with the module + error message you are encountering,
+    instead of the module repository.</strong></p>
+
+<h3 id="remote_state"><a class="anchorjs-link " href="#remote_state" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>remote_state
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">remote_state</code> block is used to configure how
+  Terragrunt will set up the remote state configuration of your
+  Terraform code. You can read more about Terragrunt’s remote state functionality in <a
+    href="/docs/features/keep-your-remote-state-configuration-dry/">Keep your remote state configuration
+    DRY</a> use case overview.</p>
+
+<p>The <code class=" highlighter-rouge language-plaintext">remote_state</code> block supports the following arguments:
+</p>
+
+<ul>
+  <li>
+    <p><code class=" highlighter-rouge language-plaintext">backend</code> (attribute): Specifies which remote state
+      backend will be configured. This should be one of the
+      <a href="https://www.terraform.io/docs/backends/types/index.html">backend types</a> that Terraform supports.
+    </p>
+  </li>
+  <li>
+    <p><code class=" highlighter-rouge language-plaintext">disable_init</code> (attribute): When <code
+        class=" highlighter-rouge language-plaintext">true</code>, skip automatic initialization of the backend by
+      Terragrunt. Some backends
+      have support in Terragrunt to be automatically created if the storage does not exist. Currently <code
+        class=" highlighter-rouge language-plaintext">s3</code> and <code
+        class=" highlighter-rouge language-plaintext">gcs</code> are the
+      two backends with support for automatic creation. Defaults to <code
+        class=" highlighter-rouge language-plaintext">false</code>.</p>
+  </li>
+  <li>
+    <p><code class=" highlighter-rouge language-plaintext">disable_dependency_optimization</code> (attribute): When
+      <code class=" highlighter-rouge language-plaintext">true</code>, disable optimized dependency fetching for
+      terragrunt
+      modules using this <code class=" highlighter-rouge language-plaintext">remote_state</code> block. See the
+      documentation for <a href="#dependency">dependency block</a> for more details.
+    </p>
+  </li>
+  <li>
+    <p><code class=" highlighter-rouge language-plaintext">generate</code> (attribute): Configure Terragrunt to
+      automatically generate a <code class=" highlighter-rouge language-plaintext">.tf</code> file that configures the
+      remote state
+      backend. This is a map that expects two properties:</p>
+
+    <ul>
+      <li><code class=" highlighter-rouge language-plaintext">path</code>: The path where the generated file should be
+        written. If a relative path, it’ll be relative to the Terragrunt
+        working dir (where the terraform code lives).</li>
+      <li><code class=" highlighter-rouge language-plaintext">if_exists</code> (attribute): What to do if a file
+        already exists at <code class=" highlighter-rouge language-plaintext">path</code>. Valid values are: <code
+          class=" highlighter-rouge language-plaintext">overwrite</code> (overwrite the
+        existing file), <code class=" highlighter-rouge language-plaintext">overwrite_terragrunt</code> (overwrite the
+        existing file if it was generated by terragrunt; otherwise,
+        error) <code class=" highlighter-rouge language-plaintext">skip</code> (skip code generation and leave the
+        existing file as-is), <code class=" highlighter-rouge language-plaintext">error</code> (exit with an error).
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><code class=" highlighter-rouge language-plaintext">config</code> (attribute): An arbitrary map that is used to
+      fill in the backend configuration in Terraform. All the
+      properties will automatically be included in the Terraform backend block (with a few exceptions: see below). For
+      example, if you had the following <code class=" highlighter-rouge language-plaintext">remote_state</code> block:
+    </p>
+
+    <div class="language-hcl highlighter-rouge">
+      <div class="highlight">
+        <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token keyword">remote_state</span> <span class="token punctuation">{</span>
+  <span class="token property">backend</span> <span class="token punctuation">=</span> <span class="token string">"s3"</span>
+  <span class="token property">config</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">bucket</span> <span class="token punctuation">=</span> <span class="token string">"mybucket"</span>
+    <span class="token property">key</span>    <span class="token punctuation">=</span> <span class="token string">"path/to/my/key"</span>
+    <span class="token property">region</span> <span class="token punctuation">=</span> <span class="token string">"us-east-1"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+      </div>
+    </div>
+
+    <p>This is equivalent to the following <code class=" highlighter-rouge language-plaintext">terraform</code> code:
+    </p>
+
+    <div class="language-hcl highlighter-rouge">
+      <div class="highlight">
+        <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token keyword">terraform</span> <span class="token punctuation">{</span>
+  <span class="token keyword">backend<span class="token type variable"> "s3" </span></span><span class="token punctuation">{</span>
+    <span class="token property">bucket</span> <span class="token punctuation">=</span> <span class="token string">"mybucket"</span>
+    <span class="token property">key</span>    <span class="token punctuation">=</span> <span class="token string">"path/to/my/key"</span>
+    <span class="token property">region</span> <span class="token punctuation">=</span> <span class="token string">"us-east-1"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+      </div>
+    </div>
+  </li>
+</ul>
+
+<p>Note that <code class=" highlighter-rouge language-plaintext">remote_state</code> can also be set as an attribute.
+  This is useful if you want to set <code class=" highlighter-rouge language-plaintext">remote_state</code>
+  dynamically.
+  For example, if in <code class=" highlighter-rouge language-plaintext">common.hcl</code> you had:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token keyword">remote_state</span> <span class="token punctuation">{</span>
+  <span class="token property">backend</span> <span class="token punctuation">=</span> <span class="token string">"s3"</span>
+  <span class="token property">config</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">bucket</span> <span class="token punctuation">=</span> <span class="token string">"mybucket"</span>
+    <span class="token property">key</span>    <span class="token punctuation">=</span> <span class="token string">"path/to/my/key"</span>
+    <span class="token property">region</span> <span class="token punctuation">=</span> <span class="token string">"us-east-1"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<p>Then in a <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file, you could dynamically set
+  <code class=" highlighter-rouge language-plaintext">remote_state</code> as an attribute as follows:
+</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token keyword">locals</span> <span class="token punctuation">{</span>
+  <span class="token comment"># Load the data from common.hcl</span>
+  <span class="token property">common</span> <span class="token punctuation">=</span> read_terragrunt_config(find_in_parent_folders(<span class="token string">"common.hcl"</span>))
+<span class="token punctuation">}</span>
+
+<span class="token comment"># Set the remote_state config dynamically to the remote_state config in common.hcl</span>
+<span class="token property">remote_state</span> <span class="token punctuation">=</span> local.common.remote_state
+</code></pre>
+  </div>
+</div>
+
+<p>Note that Terragrunt does special processing of the <code class=" highlighter-rouge language-plaintext">config</code>
+  attribute for the <code class=" highlighter-rouge language-plaintext">s3</code> and <code
+    class=" highlighter-rouge language-plaintext">gcs</code> remote state backends, and
+  supports additional keys that are used to configure the automatic initialization feature of Terragrunt.</p>
+
+<p>For the <code class=" highlighter-rouge language-plaintext">s3</code> backend, the following additional properties
+  are supported in the <code class=" highlighter-rouge language-plaintext">config</code> attribute:</p>
+
+<ul>
+  <li><code class=" highlighter-rouge language-plaintext">region</code> - (Optional) The region of the S3 bucket.</li>
+  <li><code class=" highlighter-rouge language-plaintext">profile</code> - (Optional) This is the AWS profile name as
+    set in the shared credentials file.</li>
+  <li><code class=" highlighter-rouge language-plaintext">endpoint</code> - (Optional) A custom endpoint for the S3
+    API.</li>
+  <li><code class=" highlighter-rouge language-plaintext">encrypt</code> - (Optional) Whether to enable server side
+    encryption of the state file. If disabled, a log warning will be issued in the console output to notify the user.
+    If <code class=" highlighter-rouge language-plaintext">skip_bucket_ssencryption</code> is enabled, the log will be
+    written as a debug log.</li>
+  <li><code class=" highlighter-rouge language-plaintext">role_arn</code> - (Optional) The role to be assumed.</li>
+  <li><code class=" highlighter-rouge language-plaintext">shared_credentials_file</code> - (Optional) This is the path
+    to the shared credentials file. If this is not set and a profile is specified, <code
+      class=" highlighter-rouge language-plaintext">~/.aws/credentials</code> will be used.</li>
+  <li><code class=" highlighter-rouge language-plaintext">external_id</code> - (Optional) The external ID to use when
+    assuming the role.</li>
+  <li><code class=" highlighter-rouge language-plaintext">session_name</code> - (Optional) The session name to use
+    when assuming the role.</li>
+  <li><code class=" highlighter-rouge language-plaintext">dynamodb_table</code> - (Optional) The name of a DynamoDB
+    table to use for state locking and consistency. The table must have a primary key named LockID. If not present,
+    locking will be disabled.</li>
+  <li><code class=" highlighter-rouge language-plaintext">skip_bucket_versioning</code>: When <code
+      class=" highlighter-rouge language-plaintext">true</code>, the S3 bucket that is created to store the state will
+    not be versioned.</li>
+  <li><code class=" highlighter-rouge language-plaintext">skip_bucket_ssencryption</code>: When <code
+      class=" highlighter-rouge language-plaintext">true</code>, the S3 bucket that is created to store the state will
+    not be configured with server-side encryption.</li>
+  <li><code class=" highlighter-rouge language-plaintext">skip_bucket_accesslogging</code>: <em>DEPRECATED</em> If
+    provided, will be ignored. A log warning will be issued in the console output to notify the user.</li>
+  <li><code class=" highlighter-rouge language-plaintext">skip_bucket_root_access</code>: When <code
+      class=" highlighter-rouge language-plaintext">true</code>, the S3 bucket that is created will not be configured
+    with bucket policies that allow access to the root AWS user.</li>
+  <li><code class=" highlighter-rouge language-plaintext">skip_bucket_enforced_tls</code>: When <code
+      class=" highlighter-rouge language-plaintext">true</code>, the S3 bucket that is created will not be configured
+    with a bucket policy that enforces access to the bucket via a TLS connection.</li>
+  <li><code class=" highlighter-rouge language-plaintext">skip_bucket_public_access_blocking</code>: When <code
+      class=" highlighter-rouge language-plaintext">true</code>, the S3 bucket that is created will not have public
+    access blocking enabled.</li>
+  <li><code class=" highlighter-rouge language-plaintext">disable_bucket_update</code>: When <code
+      class=" highlighter-rouge language-plaintext">true</code>, disable update S3 bucket if not equal configured in
+    config block</li>
+  <li><code class=" highlighter-rouge language-plaintext">enable_lock_table_ssencryption</code>: When <code
+      class=" highlighter-rouge language-plaintext">true</code>, the synchronization lock table in DynamoDB used for
+    remote state concurrent access will not be configured with server side encryption.</li>
+  <li><code class=" highlighter-rouge language-plaintext">s3_bucket_tags</code>: A map of key value pairs to associate
+    as tags on the created S3 bucket.</li>
+  <li><code class=" highlighter-rouge language-plaintext">dynamodb_table_tags</code>: A map of key value pairs to
+    associate as tags on the created DynamoDB remote state lock table.</li>
+  <li><code class=" highlighter-rouge language-plaintext">accesslogging_bucket_tags</code>: A map of key value pairs
+    to associate as tags on the created S3 bucket to store de access logs.</li>
+  <li><code class=" highlighter-rouge language-plaintext">disable_aws_client_checksums</code>: When <code
+      class=" highlighter-rouge language-plaintext">true</code>, disable computing and checking checksums on the
+    request and response,
+    such as the CRC32 check for DynamoDB. See <a href="https://github.com/gruntwork-io/terragrunt/issues/1059">#1059</a>
+    for issue where this is a useful
+    workaround.</li>
+  <li><code class=" highlighter-rouge language-plaintext">accesslogging_bucket_name</code>: (Optional) When provided
+    as a valid <code class=" highlighter-rouge language-plaintext">string</code>, create an S3 bucket with this name
+    to store the access logs for the S3 bucket used to store Terraform state. If not provided, or string is empty or
+    invalid S3 bucket name, then server access logging for the S3 bucket storing the terraform state will be disabled.
+    <strong>Note:</strong> When access logging is enabled supported encryption for state bucket is only <code
+      class=" highlighter-rouge language-plaintext">AES256</code>. Reference: <a
+      href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html">S3 server access
+      logging</a>
+  </li>
+  <li><code class=" highlighter-rouge language-plaintext">accesslogging_target_prefix</code>: (Optional) When provided
+    as a valid <code class=" highlighter-rouge language-plaintext">string</code>, set the <code
+      class=" highlighter-rouge language-plaintext">TargetPrefix</code> for the access log objects in the S3 bucket
+    used to store Terraform state. If set to <strong>empty</strong><code
+      class=" highlighter-rouge language-plaintext">string</code>, then <code
+      class=" highlighter-rouge language-plaintext">TargetPrefix</code> will be set to <strong>empty</strong> <code
+      class=" highlighter-rouge language-plaintext">string</code>. If attribute is not provided at all, then <code
+      class=" highlighter-rouge language-plaintext">TargetPrefix</code> will be set to <strong>default</strong> value
+    <code class=" highlighter-rouge language-plaintext">TFStateLogs/</code>. This attribute won’t take effect if the
+    <code class=" highlighter-rouge language-plaintext">accesslogging_bucket_name</code> attribute is not present.
+  </li>
+  <li><code class=" highlighter-rouge language-plaintext">bucket_sse_algorithm</code>: (Optional) The algorithm to use
+    for server side encryption of the state bucket. Defaults to <code
+      class=" highlighter-rouge language-plaintext">aws:kms</code>.</li>
+  <li><code class=" highlighter-rouge language-plaintext">bucket_sse_kms_key_id</code>: (Optional) The KMS Key to use
+    when the encryption algorithm is <code class=" highlighter-rouge language-plaintext">aws:kms</code>. Defaults to
+    the AWS Managed <code class=" highlighter-rouge language-plaintext">aws/s3</code> key.</li>
+  <li><code class=" highlighter-rouge language-plaintext">assume_role</code>: (Optional) A configuration <code
+      class=" highlighter-rouge language-plaintext">map</code> to use when assuming a role (starting with Terraform
+    1.6). Override top level arguments
+    <ul>
+      <li><code class=" highlighter-rouge language-plaintext">role_arn</code> - (Optional) The role to be assumed.
+      </li>
+      <li><code class=" highlighter-rouge language-plaintext">external_id</code> - (Optional) The external ID to use
+        when assuming the role.</li>
+      <li><code class=" highlighter-rouge language-plaintext">session_name</code> - (Optional) The session name to use
+        when assuming the role.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>For the <code class=" highlighter-rouge language-plaintext">gcs</code> backend, the following additional properties
+  are supported in the <code class=" highlighter-rouge language-plaintext">config</code> attribute:</p>
+
+<ul>
+  <li><code class=" highlighter-rouge language-plaintext">skip_bucket_creation</code>: When <code
+      class=" highlighter-rouge language-plaintext">true</code>, Terragrunt will skip the auto initialization routine
+    for setting up the GCS
+    bucket for use with remote state.</li>
+  <li><code class=" highlighter-rouge language-plaintext">skip_bucket_versioning</code>: When <code
+      class=" highlighter-rouge language-plaintext">true</code>, the GCS bucket that is created to store the state
+    will not be versioned.</li>
+  <li><code class=" highlighter-rouge language-plaintext">enable_bucket_policy_only</code>: When <code
+      class=" highlighter-rouge language-plaintext">true</code>, the GCS bucket that is created to store the state
+    will be configured to use uniform bucket-level access.</li>
+  <li><code class=" highlighter-rouge language-plaintext">project</code>: The GCP project where the bucket will be
+    created.</li>
+  <li><code class=" highlighter-rouge language-plaintext">location</code>: The GCP location where the bucket will be
+    created.</li>
+  <li><code class=" highlighter-rouge language-plaintext">gcs_bucket_labels</code>: A map of key value pairs to
+    associate as labels on the created GCS bucket.</li>
+  <li><code class=" highlighter-rouge language-plaintext">credentials</code>: Local path to Google Cloud Platform
+    account credentials in JSON format.</li>
+  <li><code class=" highlighter-rouge language-plaintext">access_token</code>: A temporary [OAuth 2.0 access token]
+    obtained from the Google Authorization server.
+    Example with S3:</li>
+</ul>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Configure terraform state to be stored in S3, in the bucket "my-terraform-state" in us-east-1 under a key that is</span>
+<span class="token comment"># relative to included terragrunt config. For example, if you had the following folder structure:</span>
+<span class="token comment">#</span>
+<span class="token comment"># .</span>
+<span class="token comment"># ├── terragrunt.hcl</span>
+<span class="token comment"># └── child</span>
+<span class="token comment">#     ├── main.tf</span>
+<span class="token comment">#     └── terragrunt.hcl</span>
+<span class="token comment">#</span>
+<span class="token comment"># And the following is defined in the root terragrunt.hcl config that is included in the child, the state file for the</span>
+<span class="token comment"># child module will be stored at the key "child/terraform.tfstate".</span>
+<span class="token comment">#</span>
+<span class="token comment"># Note that since we are not using any of the skip args, this will automatically create the S3 bucket</span>
+<span class="token comment"># "my-terraform-state" and DynamoDB table "my-lock-table" if it does not already exist.</span>
+<span class="token comment"># terragrunt.hcl</span>
+<span class="token keyword">remote_state</span> <span class="token punctuation">{</span>
+  <span class="token property">backend</span> <span class="token punctuation">=</span> <span class="token string">"s3"</span>
+  <span class="token property">config</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">bucket</span>         <span class="token punctuation">=</span> <span class="token string">"my-terraform-state"</span>
+    <span class="token property">key</span>            <span class="token punctuation">=</span> <span class="token string">"<span class="token interpolation"><span class="token punctuation">$</span><span class="token punctuation">{</span><span class="token function">path_relative_to_include</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span>/terraform.tfstate"</span>
+    <span class="token property">region</span>         <span class="token punctuation">=</span> <span class="token string">"us-east-1"</span>
+    <span class="token property">encrypt</span>        <span class="token punctuation">=</span> <span class="token boolean">true</span>
+    <span class="token property">dynamodb_table</span> <span class="token punctuation">=</span> <span class="token string">"my-lock-table"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment"># child/terragrunt.hcl</span>
+include <span class="token string">"root"</span> <span class="token punctuation">{</span>
+  <span class="token property">path</span>   <span class="token punctuation">=</span> find_in_parent_folders()
+<span class="token punctuation">}</span>
+
+<span class="token comment"># child/main.tf</span>
+<span class="token keyword">terraform</span> <span class="token punctuation">{</span>
+  <span class="token keyword">backend<span class="token type variable"> "s3" </span></span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<p>Example with GCS:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Configure terraform state to be stored in GCS, in the bucket "my-terraform-state" in the "my-terraform" GCP project in</span>
+<span class="token comment"># the eu region under a key that is relative to included terragrunt config. This will also apply the labels</span>
+<span class="token comment"># "owner=terragrunt_test" and "name=terraform_state_storage" to the bucket if it is created by Terragrunt.</span>
+<span class="token comment">#</span>
+<span class="token comment"># For example, if you had the following folder structure:</span>
+<span class="token comment">#</span>
+<span class="token comment"># .</span>
+<span class="token comment"># ├── terragrunt.hcl</span>
+<span class="token comment"># └── child</span>
+<span class="token comment">#     ├── main.tf</span>
+<span class="token comment">#     └── terragrunt.hcl</span>
+<span class="token comment">#</span>
+<span class="token comment"># And the following is defined in the root terragrunt.hcl config that is included in the child, the state file for the</span>
+<span class="token comment"># child module will be stored at the key "child/terraform.tfstate".</span>
+<span class="token comment">#</span>
+<span class="token comment"># Note that since we are not using any of the skip args, this will automatically create the GCS bucket</span>
+<span class="token comment"># "my-terraform-state" if it does not already exist.</span>
+
+<span class="token comment"># terragrunt.hcl</span>
+<span class="token keyword">remote_state</span> <span class="token punctuation">{</span>
+  <span class="token property">backend</span> <span class="token punctuation">=</span> <span class="token string">"gcs"</span>
+
+  <span class="token property">config</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">project</span>  <span class="token punctuation">=</span> <span class="token string">"my-terraform"</span>
+    <span class="token property">location</span> <span class="token punctuation">=</span> <span class="token string">"eu"</span>
+    <span class="token property">bucket</span>   <span class="token punctuation">=</span> <span class="token string">"my-terraform-state"</span>
+    <span class="token property">prefix</span>   <span class="token punctuation">=</span> <span class="token string">"<span class="token interpolation"><span class="token punctuation">$</span><span class="token punctuation">{</span><span class="token function">path_relative_to_include</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span>/terraform.tfstate"</span>
+
+    <span class="token property">gcs_bucket_labels</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+      <span class="token property">owner</span> <span class="token punctuation">=</span> <span class="token string">"terragrunt_test"</span>
+      <span class="token property">name</span>  <span class="token punctuation">=</span> <span class="token string">"terraform_state_storage"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment"># child/terragrunt.hcl</span>
+include <span class="token string">"root"</span> <span class="token punctuation">{</span>
+  <span class="token property">path</span>   <span class="token punctuation">=</span> find_in_parent_folders()
+<span class="token punctuation">}</span>
+
+<span class="token comment"># child/main.tf</span>
+<span class="token keyword">terraform</span> <span class="token punctuation">{</span>
+  <span class="token keyword">backend<span class="token type variable"> "gcs" </span></span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<h3 id="include"><a class="anchorjs-link " href="#include" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>include
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">include</code> block is used to specify inheritance of
+  Terragrunt configuration files. The included config (also called
+  the <code class=" highlighter-rouge language-plaintext">parent</code>) will be merged with the current configuration
+  (also called the <code class=" highlighter-rouge language-plaintext">child</code>) before processing. You can learn
+  more about the inheritance properties of Terragrunt in the <a
+    href="/docs/features/keep-your-remote-state-configuration-dry/#filling-in-remote-state-settings-with-terragrunt">Filling
+    in remote state settings with Terragrunt
+    section</a> of the
+  “Keep your remote state configuration DRY” use case overview.</p>
+
+<p>You can have more than one <code class=" highlighter-rouge language-plaintext">include</code> block, but each one
+  must have a unique label. It is recommended to always label
+  your <code class=" highlighter-rouge language-plaintext">include</code> blocks. Bare includes (<code
+    class=" highlighter-rouge language-plaintext">include</code> block with no label - e.g., <code
+    class=" highlighter-rouge language-plaintext">include {}</code>) are currently supported for
+  backward compatibility, but is deprecated usage and support may be removed in the future.</p>
+
+<p><code class=" highlighter-rouge language-plaintext">include</code> blocks support the following arguments:</p>
+
+<ul>
+  <li><code class=" highlighter-rouge language-plaintext">name</code> (label): You can define multiple <code
+      class=" highlighter-rouge language-plaintext">include</code> blocks in a single terragrunt config. Each include
+    block
+    must be labeled with a unique name to differentiate it from the other includes. E.g., if you had a block <code
+      class=" highlighter-rouge language-plaintext">include
+"remote" {}</code>, you can reference the relevant exposed data with the expression <code
+      class=" highlighter-rouge language-plaintext">include.remote</code>.</li>
+  <li><code class=" highlighter-rouge language-plaintext">path</code> (attribute): Specifies the path to a Terragrunt
+    configuration file (the <code class=" highlighter-rouge language-plaintext">parent</code> config) that should be
+    merged
+    with this configuration (the <code class=" highlighter-rouge language-plaintext">child</code> config).</li>
+  <li><code class=" highlighter-rouge language-plaintext">expose</code> (attribute, optional): Specifies whether or
+    not the included config should be parsed and exposed as a
+    variable. When <code class=" highlighter-rouge language-plaintext">true</code>, you can reference the data of the
+    included config under the variable <code class=" highlighter-rouge language-plaintext">include</code>. Defaults to
+    <code class=" highlighter-rouge language-plaintext">false</code>. Note that the <code
+      class=" highlighter-rouge language-plaintext">include</code> variable is a map of <code
+      class=" highlighter-rouge language-plaintext">include</code> labels to the parsed configuration value.
+  </li>
+  <li><code class=" highlighter-rouge language-plaintext">merge_strategy</code> (attribute, optional): Specifies how
+    the included config should be merged. Valid values are:
+    <code class=" highlighter-rouge language-plaintext">no_merge</code> (do not merge the included config), <code
+      class=" highlighter-rouge language-plaintext">shallow</code> (do a shallow merge - default), <code
+      class=" highlighter-rouge language-plaintext">deep</code> (do a deep merge of
+    the included config).
+  </li>
+</ul>
+
+<p><strong>NOTE</strong>: At this time, Terragrunt only supports a single level of <code
+    class=" highlighter-rouge language-plaintext">include</code> blocks. That is, Terragrunt will error out
+  if an included config also has an <code class=" highlighter-rouge language-plaintext">include</code> block defined.
+  If you are interested in this feature, please follow
+  <a href="https://github.com/gruntwork-io/terragrunt/issues/1566">#1566</a> to be notified when nested <code
+    class=" highlighter-rouge language-plaintext">include</code> blocks are supported.
+</p>
+
+<p><strong>Special case for shallow merge</strong>: When performing a shallow merge, all attributes and blocks are
+  merged shallowly with
+  replacement, except for <code class=" highlighter-rouge language-plaintext">dependencies</code> blocks (NOT <code
+    class=" highlighter-rouge language-plaintext">dependency</code> block). <code
+    class=" highlighter-rouge language-plaintext">dependencies</code> blocks are deep merged: that is,
+  all the lists of paths from included configurations are concatenated together, rather than replaced in override
+  fashion.</p>
+
+<p>Examples:</p>
+
+<h4 id="single-include"><a class="anchorjs-link " href="#single-include" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>Single
+  include</h4>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># If you have the following folder structure, and the following contents for ./child/terragrunt.hcl, this will include</span>
+<span class="token comment"># and merge the items in the terragrunt.hcl file at the root.</span>
+<span class="token comment">#</span>
+<span class="token comment"># .</span>
+<span class="token comment"># ├── terragrunt.hcl</span>
+<span class="token comment"># └── child</span>
+<span class="token comment">#     ├── main.tf</span>
+<span class="token comment">#     └── terragrunt.hcl</span>
+
+<span class="token comment"># terragrunt.hcl</span>
+<span class="token keyword">remote_state</span> <span class="token punctuation">{</span>
+  <span class="token property">backend</span> <span class="token punctuation">=</span> <span class="token string">"s3"</span>
+  <span class="token property">config</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">bucket</span>         <span class="token punctuation">=</span> <span class="token string">"my-terraform-state"</span>
+    <span class="token property">key</span>            <span class="token punctuation">=</span> <span class="token string">"<span class="token interpolation"><span class="token punctuation">$</span><span class="token punctuation">{</span><span class="token function">path_relative_to_include</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span>/terraform.tfstate"</span>
+    <span class="token property">region</span>         <span class="token punctuation">=</span> <span class="token string">"us-east-1"</span>
+    <span class="token property">encrypt</span>        <span class="token punctuation">=</span> <span class="token boolean">true</span>
+    <span class="token property">dynamodb_table</span> <span class="token punctuation">=</span> <span class="token string">"my-lock-table"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment"># child/terragrunt.hcl</span>
+include <span class="token string">"root"</span> <span class="token punctuation">{</span>
+  <span class="token property">path</span>   <span class="token punctuation">=</span> find_in_parent_folders()
+  <span class="token property">expose</span> <span class="token punctuation">=</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span>
+
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">remote_state_config</span> <span class="token punctuation">=</span> include.root.remote_state
+<span class="token punctuation">}</span>
+
+<span class="token comment"># child/main.tf</span>
+<span class="token keyword">terraform</span> <span class="token punctuation">{</span>
+  <span class="token keyword">backend<span class="token type variable"> "s3" </span></span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<h4 id="multiple-includes"><a class="anchorjs-link " href="#multiple-includes" aria-label="Anchor"
+    data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>Multiple
+  includes</h4>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># If you have the following folder structure, and the following contents for ./child/terragrunt.hcl, this will include</span>
+<span class="token comment"># and merge the items in the terragrunt.hcl file at the root, while only loading the data in the region.hcl</span>
+<span class="token comment"># configuration.</span>
+<span class="token comment">#</span>
+<span class="token comment"># .</span>
+<span class="token comment"># ├── terragrunt.hcl</span>
+<span class="token comment"># ├── region.hcl</span>
+<span class="token comment"># └── child</span>
+<span class="token comment">#     └── terragrunt.hcl</span>
+
+<span class="token comment"># terragrunt.hcl</span>
+<span class="token keyword">remote_state</span> <span class="token punctuation">{</span>
+  <span class="token property">backend</span> <span class="token punctuation">=</span> <span class="token string">"s3"</span>
+  <span class="token property">config</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">bucket</span>         <span class="token punctuation">=</span> <span class="token string">"my-terraform-state"</span>
+    <span class="token property">key</span>            <span class="token punctuation">=</span> <span class="token string">"<span class="token interpolation"><span class="token punctuation">$</span><span class="token punctuation">{</span><span class="token function">path_relative_to_include</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span>/terraform.tfstate"</span>
+    <span class="token property">region</span>         <span class="token punctuation">=</span> <span class="token string">"us-east-1"</span>
+    <span class="token property">encrypt</span>        <span class="token punctuation">=</span> <span class="token boolean">true</span>
+    <span class="token property">dynamodb_table</span> <span class="token punctuation">=</span> <span class="token string">"my-lock-table"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment"># region.hcl</span>
+<span class="token keyword">locals</span> <span class="token punctuation">{</span>
+  <span class="token property">region</span> <span class="token punctuation">=</span> <span class="token string">"production"</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment"># child/terragrunt.hcl</span>
+include <span class="token string">"remote_state"</span> <span class="token punctuation">{</span>
+  <span class="token property">path</span>   <span class="token punctuation">=</span> find_in_parent_folders()
+  <span class="token property">expose</span> <span class="token punctuation">=</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span>
+
+include <span class="token string">"region"</span> <span class="token punctuation">{</span>
+  <span class="token property">path</span>           <span class="token punctuation">=</span> find_in_parent_folders(<span class="token string">"region.hcl"</span>)
+  <span class="token property">expose</span>         <span class="token punctuation">=</span> <span class="token boolean">true</span>
+  <span class="token property">merge_strategy</span> <span class="token punctuation">=</span> <span class="token string">"no_merge"</span>
+<span class="token punctuation">}</span>
+
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">remote_state_config</span> <span class="token punctuation">=</span> include.remote_state.remote_state
+  <span class="token property">region</span>              <span class="token punctuation">=</span> include.region.locals.region
+<span class="token punctuation">}</span>
+
+<span class="token comment"># child/main.tf</span>
+<span class="token keyword">terraform</span> <span class="token punctuation">{</span>
+  <span class="token keyword">backend<span class="token type variable"> "s3" </span></span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<h4 id="limitations-on-accessing-exposed-config"><a class="anchorjs-link "
+    href="#limitations-on-accessing-exposed-config" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>Limitations
+  on accessing exposed config</h4>
+
+<p>In general, you can access all attributes on <code class=" highlighter-rouge language-plaintext">include</code>
+  when they are exposed (e.g., <code class=" highlighter-rouge language-plaintext">include.locals</code>, <code
+    class=" highlighter-rouge language-plaintext">include.inputs</code>,
+  etc).</p>
+
+<p>However, to support <code class=" highlighter-rouge language-plaintext">run-all</code>, Terragrunt is unable to
+  expose all attributes when the included config has a <code
+    class=" highlighter-rouge language-plaintext">dependency</code>
+  block. To understand this, consider the following example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Root terragrunt.hcl</span>
+dependency <span class="token string">"vpc"</span> <span class="token punctuation">{</span>
+  <span class="token property">config_path</span> <span class="token punctuation">=</span> <span class="token string">"<span class="token interpolation"><span class="token punctuation">$</span><span class="token punctuation">{</span><span class="token function">get_terragrunt_dir</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span>/../vpc"</span>
+<span class="token punctuation">}</span>
+
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">vpc_name</span> <span class="token punctuation">=</span> dependency.vpc.outputs.name
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Child terragrunt.hcl</span>
+include <span class="token string">"root"</span> <span class="token punctuation">{</span>
+  <span class="token property">path</span>   <span class="token punctuation">=</span> find_in_parent_folders()
+  <span class="token property">expose</span> <span class="token punctuation">=</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span>
+
+dependency <span class="token string">"alb"</span> <span class="token punctuation">{</span>
+  <span class="token property">config_path</span> <span class="token punctuation">=</span> (
+    include.root.inputs.vpc_name <span class="token punctuation">=</span><span class="token punctuation">=</span> <span class="token string">"mgmt"</span>
+    ? <span class="token property">"../alb-public"</span>
+    : <span class="token string">"../alb-private"</span>
+  )
+<span class="token punctuation">}</span>
+
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">alb_id</span> <span class="token punctuation">=</span> dependency.alb.outputs.id
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<p>In the child <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code>, the <code
+    class=" highlighter-rouge language-plaintext">dependency</code> path for the <code
+    class=" highlighter-rouge language-plaintext">alb</code> depends on whether the VPC is the <code
+    class=" highlighter-rouge language-plaintext">mgmt</code> VPC or not,
+  which is determined by the <code class=" highlighter-rouge language-plaintext">dependency.vpc</code> in the root
+  config. This means that the output from <code class=" highlighter-rouge language-plaintext">dependency.vpc</code>
+  must be
+  available to parse the <code class=" highlighter-rouge language-plaintext">dependency.alb</code> config.</p>
+
+<p>This causes problems when performing a <code class=" highlighter-rouge language-plaintext">run-all apply</code>
+  operation. During a <code class=" highlighter-rouge language-plaintext">run-all</code> operation, Terragrunt first
+  parses
+  all the <code class=" highlighter-rouge language-plaintext">dependency</code> blocks to build a dependency tree of
+  the Terragrunt modules to figure out the order of operations.
+  If all the paths are static references, then Terragrunt can determine all the dependency paths before any module has
+  been applied. In this case there is no problem even if other config blocks access <code
+    class=" highlighter-rouge language-plaintext">dependency</code>, as by the time
+  Terragrunt needs to parse those blocks, the upstream dependencies would have been applied during the <code
+    class=" highlighter-rouge language-plaintext">run-all apply</code>.</p>
+
+<p>However, if those <code class=" highlighter-rouge language-plaintext">dependency</code> blocks depend on upstream
+  dependencies, then there is a problem as Terragrunt would not
+  be able to build the dependency tree without the upstream dependencies being applied.</p>
+
+<p>Therefore, to ensure that Terragrunt can build the dependency tree in a <code
+    class=" highlighter-rouge language-plaintext">run-all</code> operation, Terragrunt enforces the
+  following limitation to exposed <code class=" highlighter-rouge language-plaintext">include</code> config:</p>
+
+<p>If the included configuration has any <code class=" highlighter-rouge language-plaintext">dependency</code> blocks,
+  only <code class=" highlighter-rouge language-plaintext">locals</code> and <code
+    class=" highlighter-rouge language-plaintext">include</code> are exposed and available to the
+  child <code class=" highlighter-rouge language-plaintext">include</code> and <code
+    class=" highlighter-rouge language-plaintext">dependency</code> blocks. There are no restrictions for other blocks
+  in the child config (e.g., you can
+  reference <code class=" highlighter-rouge language-plaintext">inputs</code> from the included config in child <code
+    class=" highlighter-rouge language-plaintext">inputs</code>).</p>
+
+<p>Otherwise, if the included config has no <code class=" highlighter-rouge language-plaintext">dependency</code>
+  blocks, there is no restriction on which exposed attributes you
+  can access.</p>
+
+<p>For example, the following alternative configuration is valid even if the alb dependency is still accessing the
+  <code class=" highlighter-rouge language-plaintext">inputs</code>
+  attribute from the included config:
+</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Root terragrunt.hcl</span>
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">vpc_name</span> <span class="token punctuation">=</span> <span class="token string">"mgmt"</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Child terragrunt.hcl</span>
+include <span class="token string">"root"</span> <span class="token punctuation">{</span>
+  <span class="token property">path</span>   <span class="token punctuation">=</span> find_in_parent_folders()
+  <span class="token property">expose</span> <span class="token punctuation">=</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span>
+
+dependency <span class="token string">"vpc"</span> <span class="token punctuation">{</span>
+  <span class="token property">config_path</span> <span class="token punctuation">=</span> <span class="token string">"../vpc"</span>
+<span class="token punctuation">}</span>
+
+dependency <span class="token string">"alb"</span> <span class="token punctuation">{</span>
+  <span class="token property">config_path</span> <span class="token punctuation">=</span> (
+    include.root.inputs.vpc_name <span class="token punctuation">=</span><span class="token punctuation">=</span> <span class="token string">"mgmt"</span>
+    ? <span class="token property">"../alb-public"</span>
+    : <span class="token string">"../alb-private"</span>
+  )
+<span class="token punctuation">}</span>
+
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">vpc_name</span> <span class="token punctuation">=</span> dependency.vpc.outputs.name
+  <span class="token property">alb_id</span>   <span class="token punctuation">=</span> dependency.alb.outputs.id
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<p><strong>What is deep merge?</strong></p>
+
+<p>When the <code class=" highlighter-rouge language-plaintext">merge_strategy</code> for the <code
+    class=" highlighter-rouge language-plaintext">include</code> block is set to <code
+    class=" highlighter-rouge language-plaintext">deep</code>, Terragrunt will perform a deep merge of the included
+  config. For Terragrunt config, deep merge is defined as follows:</p>
+
+<ul>
+  <li>For simple types, the child overrides the parent.</li>
+  <li>For lists, the two attribute lists are combined together in concatenation.</li>
+  <li>For maps, the two maps are combined together recursively. That is, if the map keys overlap, then a deep merge is
+    performed on the map value.</li>
+  <li>For blocks, if the label is the same, the two blocks are combined together recursively. Otherwise, the blocks
+    are
+    appended like a list. This is similar to maps, with block labels treated as keys.</li>
+</ul>
+
+<p>However, due to internal implementation details, some blocks are not deep mergeable. This will change in the
+  future, but
+  for now, terragrunt performs a shallow merge (that is, block definitions in the child completely override the parent
+  definition). The following blocks have this limitation: - <code
+    class=" highlighter-rouge language-plaintext">remote_state</code> - <code
+    class=" highlighter-rouge language-plaintext">generate</code></p>
+
+<p>Similarly, the <code class=" highlighter-rouge language-plaintext">locals</code> block is deliberately omitted from
+  the merge operation by design. That is, you will not be able
+  to access parent config <code class=" highlighter-rouge language-plaintext">locals</code> in the child config, and
+  vice versa in a merge. However, you can access the parent
+  locals in child config if you use the <code class=" highlighter-rouge language-plaintext">expose</code> feature.</p>
+
+<p>Finally, <code class=" highlighter-rouge language-plaintext">dependency</code> blocks have special treatment. When
+  doing a <code class=" highlighter-rouge language-plaintext">deep</code> merge, <code
+    class=" highlighter-rouge language-plaintext">dependency</code> blocks from <strong>both</strong> child
+  and parent config are accessible in <strong>both</strong> places. For example, consider the following setup:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Parent config</span>
+dependency <span class="token string">"vpc"</span> <span class="token punctuation">{</span>
+  <span class="token property">config_path</span> <span class="token punctuation">=</span> <span class="token string">"../vpc"</span>
+<span class="token punctuation">}</span>
+
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">vpc_id</span> <span class="token punctuation">=</span> dependency.vpc.outputs.vpc_id
+  <span class="token property">db_id</span> <span class="token punctuation">=</span> dependency.mysql.outputs.db_id
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Child config</span>
+include <span class="token string">"root"</span> <span class="token punctuation">{</span>
+  <span class="token property">path</span>           <span class="token punctuation">=</span> find_in_parent_folders()
+  <span class="token property">merge_strategy</span> <span class="token punctuation">=</span> <span class="token string">"deep"</span>
+<span class="token punctuation">}</span>
+
+dependency <span class="token string">"mysql"</span> <span class="token punctuation">{</span>
+  <span class="token property">config_path</span> <span class="token punctuation">=</span> <span class="token string">"../mysql"</span>
+<span class="token punctuation">}</span>
+
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">security_group_id</span> <span class="token punctuation">=</span> dependency.vpc.outputs.security_group_id
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<p>In the example, note how the parent is accessing the outputs of the <code
+    class=" highlighter-rouge language-plaintext">mysql</code> dependency even though it is not defined in
+  the parent. Similarly, the child is accessing the outputs of the <code
+    class=" highlighter-rouge language-plaintext">vpc</code> dependency even though it is not defined in the
+  child.</p>
+
+<p>Full example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Parent terragrunt.hcl</span>
+<span class="token keyword">remote_state</span> <span class="token punctuation">{</span>
+  <span class="token property">backend</span> <span class="token punctuation">=</span> <span class="token string">"s3"</span>
+  <span class="token property">config</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">encrypt</span> <span class="token punctuation">=</span> <span class="token boolean">true</span>
+    <span class="token property">bucket</span> <span class="token punctuation">=</span> <span class="token string">"__FILL_IN_BUCKET_NAME__"</span>
+    <span class="token property">key</span> <span class="token punctuation">=</span> <span class="token string">"<span class="token interpolation"><span class="token punctuation">$</span><span class="token punctuation">{</span><span class="token function">path_relative_to_include</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span>/terraform.tfstate"</span>
+    <span class="token property">region</span> <span class="token punctuation">=</span> <span class="token string">"us-west-2"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+dependency <span class="token string">"vpc"</span> <span class="token punctuation">{</span>
+  <span class="token comment"># This will get overridden by child terragrunt.hcl configs</span>
+  <span class="token property">config_path</span> <span class="token punctuation">=</span> <span class="token string">""</span>
+
+  <span class="token property">mock_outputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">attribute</span>     <span class="token punctuation">=</span> <span class="token string">"hello"</span>
+    <span class="token property">old_attribute</span> <span class="token punctuation">=</span> <span class="token string">"old val"</span>
+    <span class="token property">list_attr</span>     <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"hello"</span><span class="token punctuation">]</span>
+    <span class="token property">map_attr</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+      <span class="token property">foo</span> <span class="token punctuation">=</span> <span class="token string">"bar"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token property">mock_outputs_allowed_terraform_commands</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"apply"</span>, <span class="token string">"plan"</span>, <span class="token string">"destroy"</span>, <span class="token string">"output"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">attribute</span>     <span class="token punctuation">=</span> <span class="token string">"hello"</span>
+  <span class="token property">old_attribute</span> <span class="token punctuation">=</span> <span class="token string">"old val"</span>
+  <span class="token property">list_attr</span>     <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"hello"</span><span class="token punctuation">]</span>
+  <span class="token property">map_attr</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">foo</span> <span class="token punctuation">=</span> <span class="token string">"bar"</span>
+    <span class="token property">test</span> <span class="token punctuation">=</span> dependency.vpc.outputs.new_attribute
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Child terragrunt.hcl</span>
+include <span class="token string">"root"</span> <span class="token punctuation">{</span>
+  <span class="token property">path</span>           <span class="token punctuation">=</span> find_in_parent_folders()
+  <span class="token property">merge_strategy</span> <span class="token punctuation">=</span> <span class="token string">"deep"</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">remote_state</span> <span class="token punctuation">{</span>
+  <span class="token property">backend</span> <span class="token punctuation">=</span> <span class="token string">"local"</span>
+<span class="token punctuation">}</span>
+
+dependency <span class="token string">"vpc"</span> <span class="token punctuation">{</span>
+  <span class="token property">config_path</span> <span class="token punctuation">=</span> <span class="token string">"../vpc"</span>
+  <span class="token property">mock_outputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">attribute</span>     <span class="token punctuation">=</span> <span class="token string">"mock"</span>
+    <span class="token property">new_attribute</span> <span class="token punctuation">=</span> <span class="token string">"new val"</span>
+    <span class="token property">list_attr</span>     <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"mock"</span><span class="token punctuation">]</span>
+    <span class="token property">map_attr</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+      <span class="token property">bar</span> <span class="token punctuation">=</span> <span class="token string">"baz"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">attribute</span>     <span class="token punctuation">=</span> <span class="token string">"mock"</span>
+  <span class="token property">new_attribute</span> <span class="token punctuation">=</span> <span class="token string">"new val"</span>
+  <span class="token property">list_attr</span>     <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"mock"</span><span class="token punctuation">]</span>
+  <span class="token property">map_attr</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">bar</span> <span class="token punctuation">=</span> <span class="token string">"baz"</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token property">dep_out</span> <span class="token punctuation">=</span> dependency.vpc.outputs
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Merged terragrunt.hcl</span>
+<span class="token comment"># Child override parent completely due to deep merge limitation</span>
+<span class="token keyword">remote_state</span> <span class="token punctuation">{</span>
+  <span class="token property">backend</span> <span class="token punctuation">=</span> <span class="token string">"local"</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment"># mock_outputs are merged together with deep merge</span>
+dependency <span class="token string">"vpc"</span> <span class="token punctuation">{</span>
+  <span class="token property">config_path</span> <span class="token punctuation">=</span> <span class="token string">"../vpc"</span>       <span class="token comment"># Child overrides parent</span>
+  <span class="token property">mock_outputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">attribute</span>     <span class="token punctuation">=</span> <span class="token string">"mock"</span>     <span class="token comment"># Child overrides parent</span>
+    <span class="token property">old_attribute</span> <span class="token punctuation">=</span> <span class="token string">"old val"</span>  <span class="token comment"># From parent</span>
+    <span class="token property">new_attribute</span> <span class="token punctuation">=</span> <span class="token string">"new val"</span>  <span class="token comment"># From child</span>
+    <span class="token property">list_attr</span>     <span class="token punctuation">=</span> <span class="token punctuation">[</span>
+      <span class="token string">"hello"</span>,                 <span class="token comment"># From parent</span>
+      <span class="token string">"mock"</span>,                  <span class="token comment"># From child</span>
+    <span class="token punctuation">]</span>
+    <span class="token property">map_attr</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+      <span class="token property">foo</span> <span class="token punctuation">=</span> <span class="token string">"bar"</span>              <span class="token comment"># From parent</span>
+      <span class="token property">bar</span> <span class="token punctuation">=</span> <span class="token string">"baz"</span>              <span class="token comment"># From child</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment"># From parent</span>
+  <span class="token property">mock_outputs_allowed_terraform_commands</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"apply"</span>, <span class="token string">"plan"</span>, <span class="token string">"destroy"</span>, <span class="token string">"output"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment"># inputs are merged together with deep merge</span>
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">attribute</span>     <span class="token punctuation">=</span> <span class="token string">"mock"</span>       <span class="token comment"># Child overrides parent</span>
+  <span class="token property">old_attribute</span> <span class="token punctuation">=</span> <span class="token string">"old val"</span>    <span class="token comment"># From parent</span>
+  <span class="token property">new_attribute</span> <span class="token punctuation">=</span> <span class="token string">"new val"</span>    <span class="token comment"># From child</span>
+  <span class="token property">list_attr</span>     <span class="token punctuation">=</span> <span class="token punctuation">[</span>
+    <span class="token string">"hello"</span>,                 <span class="token comment"># From parent</span>
+    <span class="token string">"mock"</span>,                  <span class="token comment"># From child</span>
+  <span class="token punctuation">]</span>
+  <span class="token property">map_attr</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">foo</span> <span class="token punctuation">=</span> <span class="token string">"bar"</span>                                   <span class="token comment"># From parent</span>
+    <span class="token property">bar</span> <span class="token punctuation">=</span> <span class="token string">"baz"</span>                                   <span class="token comment"># From child</span>
+    <span class="token property">test</span> <span class="token punctuation">=</span> dependency.vpc.outputs.new_attribute   <span class="token comment"># From parent, referencing dependency mock output from child</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token property">dep_out</span> <span class="token punctuation">=</span> dependency.vpc.outputs                <span class="token comment"># From child</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<h3 id="locals"><a class="anchorjs-link " href="#locals" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>locals
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">locals</code> block is used to define aliases for
+  Terragrunt expressions that can be referenced within the configuration.
+  You can learn more about locals in the <a href="/docs/features/locals/">feature overview</a>.</p>
+
+<p>The <code class=" highlighter-rouge language-plaintext">locals</code> block does not have a defined set of
+  arguments that are supported. Instead, all the arguments passed into
+  <code class=" highlighter-rouge language-plaintext">locals</code> are available under the reference <code
+    class=" highlighter-rouge language-plaintext">local.ARG_NAME</code> throughout the Terragrunt configuration.
+</p>
+
+<p>Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Make the AWS region a reusable variable within the configuration</span>
+<span class="token keyword">locals</span> <span class="token punctuation">{</span>
+  <span class="token property">aws_region</span> <span class="token punctuation">=</span> <span class="token string">"us-east-1"</span>
+<span class="token punctuation">}</span>
+
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">region</span> <span class="token punctuation">=</span> local.aws_region
+  <span class="token property">name</span>   <span class="token punctuation">=</span> <span class="token string">"<span class="token interpolation"><span class="token punctuation">$</span><span class="token punctuation">{</span><span class="token keyword">local</span><span class="token punctuation">.</span><span class="token type variable">aws_region</span><span class="token punctuation">}</span></span>-bucket"</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<h3 id="dependency"><a class="anchorjs-link " href="#dependency" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>dependency
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">dependency</code> block is used to configure module
+  dependencies. Each dependency block exports the outputs of the target
+  module as block attributes you can reference throughout the configuration. You can learn more about <code
+    class=" highlighter-rouge language-plaintext">dependency</code> blocks
+  in the <a
+    href="/docs/features/execute-terraform-commands-on-multiple-modules-at-once/#dependencies-between-modules">Dependencies
+    between modules
+    section</a> of the
+  “Execute Terraform commands on multiple modules at once” use case overview.</p>
+
+<p>You can define more than one <code class=" highlighter-rouge language-plaintext">dependency</code> block. Each
+  label you provide to the block identifies another <code
+    class=" highlighter-rouge language-plaintext">dependency</code>
+  that you can reference in your config.</p>
+
+<p>The <code class=" highlighter-rouge language-plaintext">dependency</code> block supports the following arguments:
+</p>
+
+<ul>
+  <li><code class=" highlighter-rouge language-plaintext">name</code> (label): You can define multiple <code
+      class=" highlighter-rouge language-plaintext">dependency</code> blocks in a single terragrunt config. As such,
+    each block needs a
+    name to differentiate between the other blocks, which is what the first label of the block is used for. You can
+    reference the specific dependency output by the name. E.g if you had a block <code
+      class=" highlighter-rouge language-plaintext">dependency "vpc"</code>, you can reference the
+    outputs and inputs of this dependency with the expressions <code
+      class=" highlighter-rouge language-plaintext">dependency.vpc.outputs</code> and <code
+      class=" highlighter-rouge language-plaintext">dependency.vpc.inputs</code>.</li>
+  <li><code class=" highlighter-rouge language-plaintext">config_path</code> (attribute): Path to a Terragrunt module
+    (folder with a <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file) that should be
+    included
+    as a dependency in this configuration.</li>
+  <li><code class=" highlighter-rouge language-plaintext">enabled</code> (attribute): When <code
+      class=" highlighter-rouge language-plaintext">false</code>, excludes the dependency from execution. Defaults to
+    <code class=" highlighter-rouge language-plaintext">true</code>.
+  </li>
+  <li><code class=" highlighter-rouge language-plaintext">skip_outputs</code> (attribute): When <code
+      class=" highlighter-rouge language-plaintext">true</code>, skip calling <code
+      class=" highlighter-rouge language-plaintext">terragrunt output</code> when processing this dependency. If
+    <code class=" highlighter-rouge language-plaintext">mock_outputs</code> is configured, set <code
+      class=" highlighter-rouge language-plaintext">outputs</code> to the value of <code
+      class=" highlighter-rouge language-plaintext">mock_outputs</code>. Otherwise, <code
+      class=" highlighter-rouge language-plaintext">outputs</code> will be set to an
+    empty map. Put another way, setting <code class=" highlighter-rouge language-plaintext">skip_outputs</code> means
+    “use mocks all the time if <code class=" highlighter-rouge language-plaintext">mock_outputs</code> are set.”
+  </li>
+  <li><code class=" highlighter-rouge language-plaintext">mock_outputs</code> (attribute): A map of arbitrary key
+    value pairs to use as the <code class=" highlighter-rouge language-plaintext">outputs</code> attribute when no
+    outputs are
+    available from the target module, or if <code class=" highlighter-rouge language-plaintext">skip_outputs</code> is
+    <code class=" highlighter-rouge language-plaintext">true</code>. However, it’s generally recommended not to set
+    <code class=" highlighter-rouge language-plaintext">skip_outputs</code> if using <code
+      class=" highlighter-rouge language-plaintext">mock_outputs</code>, because <code
+      class=" highlighter-rouge language-plaintext">skip_outputs</code> means “use mocks all the time if they are set”
+    whereas
+    <code class=" highlighter-rouge language-plaintext">mock_outputs</code> means “use mocks only if real outputs are
+    not available.” Use <code class=" highlighter-rouge language-plaintext">locals</code> instead when <code
+      class=" highlighter-rouge language-plaintext">skip_outputs = true</code>.
+  </li>
+  <li><code class=" highlighter-rouge language-plaintext">mock_outputs_allowed_terraform_commands</code> (attribute):
+    A list of Terraform commands for which <code class=" highlighter-rouge language-plaintext">mock_outputs</code> are
+    allowed. If a command is used where <code class=" highlighter-rouge language-plaintext">mock_outputs</code> is not
+    allowed, and no outputs are available in the target module,
+    Terragrunt will throw an error when processing this dependency.</li>
+  <li><code class=" highlighter-rouge language-plaintext">mock_outputs_merge_with_state</code> (attribute):
+    DEPRECATED. Use <code class=" highlighter-rouge language-plaintext">mock_outputs_merge_strategy_with_state</code>.
+    When <code class=" highlighter-rouge language-plaintext">true</code>,
+    <code class=" highlighter-rouge language-plaintext">mock_outputs</code> and the state outputs will be merged. That
+    is, the <code class=" highlighter-rouge language-plaintext">mock_outputs</code> will be treated as defaults and
+    the
+    real state outputs will overwrite them if the keys clash.
+  </li>
+  <li><code class=" highlighter-rouge language-plaintext">mock_outputs_merge_strategy_with_state</code> (attribute):
+    Specifies how any existing state should be merged into the
+    mocks. Valid values are
+    <ul>
+      <li><code class=" highlighter-rouge language-plaintext">no_merge</code> (default) - any existing state will be
+        used as is. If the dependency does not have an existing state (it
+        hasn’t been applied yet), then the mocks will be used</li>
+      <li><code class=" highlighter-rouge language-plaintext">shallow</code> - the existing state will be shallow
+        merged into the mocks. Mocks will only be used where the output does
+        not already exist in the dependency’s state</li>
+      <li><code class=" highlighter-rouge language-plaintext">deep_map_only</code> - the existing state will be deeply
+        merged into the mocks. If an output is a map, the mock key
+        will be used where that key does not exist in the state. Lists will not be merged</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># Run `terragrunt output` on the module at the relative path `../vpc` and expose them under the attribute</span>
+<span class="token comment"># `dependency.vpc.outputs`</span>
+dependency <span class="token string">"vpc"</span> <span class="token punctuation">{</span>
+  <span class="token property">config_path</span> <span class="token punctuation">=</span> <span class="token string">"../vpc"</span>
+
+  <span class="token comment"># Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the</span>
+  <span class="token comment"># module hasn't been applied yet.</span>
+  <span class="token property">mock_outputs_allowed_terraform_commands</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"validate"</span><span class="token punctuation">]</span>
+  <span class="token property">mock_outputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+    <span class="token property">vpc_id</span> <span class="token punctuation">=</span> <span class="token string">"fake-vpc-id"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment"># Another dependency, available under the attribute `dependency.rds.outputs`</span>
+dependency <span class="token string">"rds"</span> <span class="token punctuation">{</span>
+  <span class="token property">config_path</span> <span class="token punctuation">=</span> <span class="token string">"../rds"</span>
+<span class="token punctuation">}</span>
+
+<span class="token property">inputs</span> <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">region</span> <span class="token punctuation">=</span> dependency.vpn.inputs.region
+  <span class="token property">vpc_id</span> <span class="token punctuation">=</span> dependency.vpc.outputs.vpc_id
+  <span class="token property">db_url</span> <span class="token punctuation">=</span> dependency.rds.outputs.db_url
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<p><strong>Can I speed up dependency fetching?</strong></p>
+
+<p><code class=" highlighter-rouge language-plaintext">dependency</code> blocks are fetched in parallel at each source
+  level, but will serially parse each recursive dependency. For
+  example, consider the following chain of dependencies:</p>
+
+<div class="language-text highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-text"><code class=" language-text">account --&gt; vpc --&gt; securitygroup --&gt; ecs
+                                      ^
+                                     /
+                              ecr --
+</code></pre>
+  </div>
+</div>
+
+<p>In this chain, the <code class=" highlighter-rouge language-plaintext">ecr</code> and <code
+    class=" highlighter-rouge language-plaintext">securitygroup</code> module outputs will be fetched concurrently
+  when applying the <code class=" highlighter-rouge language-plaintext">ecs</code> module,
+  but the outputs for <code class=" highlighter-rouge language-plaintext">account</code> and <code
+    class=" highlighter-rouge language-plaintext">vpc</code> will be fetched serially as terragrunt needs to
+  recursively walk through the
+  tree to retrieve the outputs at each level.</p>
+
+<p>This recursive parsing happens due to the necessity to parse the entire <code
+    class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> configuration (including
+  <code class=" highlighter-rouge language-plaintext">dependency</code> blocks) in full before being able to call
+  <code class=" highlighter-rouge language-plaintext">terraform output</code>.
+</p>
+
+<p>However, terragrunt includes an optimization to only fetch the lowest level outputs (<code
+    class=" highlighter-rouge language-plaintext">securitygroup</code> and <code
+    class=" highlighter-rouge language-plaintext">ecr</code> in this
+  example) provided that the following conditions are met in the immediate dependencies:</p>
+
+<ul>
+  <li>The remote state is managed using <code class=" highlighter-rouge language-plaintext">remote_state</code>
+    blocks.</li>
+  <li>The dependency optimization feature flag is enabled (<code
+      class=" highlighter-rouge language-plaintext">disable_dependency_optimization = false</code>, which is the
+    default).</li>
+  <li>The <code class=" highlighter-rouge language-plaintext">remote_state</code> block itself does not depend on any
+    <code class=" highlighter-rouge language-plaintext">dependency</code> outputs (<code
+      class=" highlighter-rouge language-plaintext">locals</code> and <code
+      class=" highlighter-rouge language-plaintext">include</code> are ok).
+  </li>
+  <li>You are not relying on <code class=" highlighter-rouge language-plaintext">before_hook</code>, <code
+      class=" highlighter-rouge language-plaintext">after_hook</code>, or <code
+      class=" highlighter-rouge language-plaintext">extra_arguments</code> to the <code
+      class=" highlighter-rouge language-plaintext">terraform init</code> call. NOTE:
+    terragrunt will not automatically detect this and you will need to explicitly opt out of the dependency
+    optimization
+    flag.</li>
+</ul>
+
+<p>If these conditions are met, terragrunt will only parse out the <code
+    class=" highlighter-rouge language-plaintext">remote_state</code> blocks and use that to pull down the
+  state for the target module without parsing the <code class=" highlighter-rouge language-plaintext">dependency</code>
+  blocks, avoiding the recursive dependency
+  retrieval.</p>
+
+<h3 id="dependencies"><a class="anchorjs-link " href="#dependencies" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>dependencies
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">dependencies</code> block is used to enumerate all the
+  Terragrunt modules that need to be applied in order for this
+  module to be able to apply. Note that this is purely for ordering the operations when using <code
+    class=" highlighter-rouge language-plaintext">run-all</code> commands of
+  Terraform. This does not expose or pull in the outputs like <code
+    class=" highlighter-rouge language-plaintext">dependency</code> blocks.</p>
+
+<p>The <code class=" highlighter-rouge language-plaintext">dependencies</code> block supports the following arguments:
+</p>
+
+<ul>
+  <li><code class=" highlighter-rouge language-plaintext">paths</code> (attribute): A list of paths to modules that
+    should be marked as a dependency.</li>
+</ul>
+
+<p>Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># When applying this terragrunt config in an `run-all` command, make sure the modules at "../vpc" and "../rds" are</span>
+<span class="token comment"># handled first.</span>
+<span class="token keyword">dependencies</span> <span class="token punctuation">{</span>
+  <span class="token property">paths</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"../vpc"</span>, <span class="token string">"../rds"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<h3 id="generate"><a class="anchorjs-link " href="#generate" aria-label="Anchor" data-anchorjs-icon=""
+    style="font-style: normal; font-variant: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>generate
+</h3>
+
+<p>The <code class=" highlighter-rouge language-plaintext">generate</code> block can be used to arbitrarily generate a
+  file in the terragrunt working directory (where <code class=" highlighter-rouge language-plaintext">terraform</code>
+  is called). This can be used to generate common terraform configurations that are shared across multiple terraform
+  modules. For example, you can use <code class=" highlighter-rouge language-plaintext">generate</code> to generate
+  the provider blocks in a consistent fashion by defining a
+  <code class=" highlighter-rouge language-plaintext">generate</code> block in the parent terragrunt config.
+</p>
+
+<p>The <code class=" highlighter-rouge language-plaintext">generate</code> block supports the following arguments:</p>
+
+<ul>
+  <li><code class=" highlighter-rouge language-plaintext">name</code> (label): You can define multiple <code
+      class=" highlighter-rouge language-plaintext">generate</code> blocks in a single terragrunt config. As such,
+    each block needs a
+    name to differentiate between the other blocks.</li>
+  <li><code class=" highlighter-rouge language-plaintext">path</code> (attribute): The path where the generated file
+    should be written. If a relative path, it’ll be relative to the
+    Terragrunt working dir (where the terraform code lives).</li>
+  <li><code class=" highlighter-rouge language-plaintext">if_exists</code> (attribute): What to do if a file already
+    exists at <code class=" highlighter-rouge language-plaintext">path</code>. Valid values are: <code
+      class=" highlighter-rouge language-plaintext">overwrite</code> (overwrite the
+    existing file), <code class=" highlighter-rouge language-plaintext">overwrite_terragrunt</code> (overwrite the
+    existing file if it was generated by terragrunt; otherwise,
+    error) <code class=" highlighter-rouge language-plaintext">skip</code> (skip code generation and leave the
+    existing file as-is), <code class=" highlighter-rouge language-plaintext">error</code> (exit with an error).</li>
+  <li><code class=" highlighter-rouge language-plaintext">if_disabled</code> (attribute): What to do if a file already
+    exists at <code class=" highlighter-rouge language-plaintext">path</code> and <code
+      class=" highlighter-rouge language-plaintext">disable</code> is set to <code
+      class=" highlighter-rouge language-plaintext">true</code>. Valid values are: <code
+      class=" highlighter-rouge language-plaintext">remove</code> (remove the existing file), <code
+      class=" highlighter-rouge language-plaintext">remove_terragrunt</code> (remove the existing file if it was
+    generated by terragrunt; otherwise, error) <code class=" highlighter-rouge language-plaintext">skip</code> (skip
+    removing and leave the existing file as-is). Defaults to <code
+      class=" highlighter-rouge language-plaintext">skip</code>. Optional.</li>
+  <li><code class=" highlighter-rouge language-plaintext">comment_prefix</code> (attribute): A prefix that can be used
+    to indicate comments in the generated file. This is used by
+    terragrunt to write out a signature for knowing which files were generated by terragrunt. Defaults to <code
+      class=" highlighter-rouge language-plaintext">#</code>. Optional.</li>
+  <li><code class=" highlighter-rouge language-plaintext">disable_signature</code> (attribute): When <code
+      class=" highlighter-rouge language-plaintext">true</code>, disables including a signature in the generated file.
+    This means that
+    there will be no difference between <code class=" highlighter-rouge language-plaintext">overwrite_terragrunt</code>
+    and <code class=" highlighter-rouge language-plaintext">overwrite</code> for the <code
+      class=" highlighter-rouge language-plaintext">if_exists</code> setting. Defaults to
+    <code class=" highlighter-rouge language-plaintext">false</code>. Optional.
+  </li>
+  <li><code class=" highlighter-rouge language-plaintext">contents</code> (attribute): The contents of the generated
+    file.</li>
+  <li><code class=" highlighter-rouge language-plaintext">disable</code> (attribute): Disables this generate block.
+  </li>
+</ul>
+
+<p>Example:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token comment"># When using this terragrunt config, terragrunt will generate the file "provider.tf" with the aws provider block before</span>
+<span class="token comment"># calling to terraform. Note that this will overwrite the `provider.tf` file if it already exists.</span>
+generate <span class="token string">"provider"</span> <span class="token punctuation">{</span>
+  <span class="token property">path</span>      <span class="token punctuation">=</span> <span class="token string">"provider.tf"</span>
+  <span class="token property">if_exists</span> <span class="token punctuation">=</span> <span class="token string">"overwrite"</span>
+  <span class="token property">contents</span> <span class="token punctuation">=</span> <span class="token heredoc string">&lt;&lt;EOF
+provider "aws" {
+  region              = "us-east-1"
+  version             = "= 2.3.1"
+  allowed_account_ids = ["1234567890"]
+}
+EOF</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<p>Note that <code class=" highlighter-rouge language-plaintext">generate</code> can also be set as an attribute. This
+  is useful if you want to set <code class=" highlighter-rouge language-plaintext">generate</code> dynamically.
+  For example, if in <code class=" highlighter-rouge language-plaintext">common.hcl</code> you had:</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl">  generate <span class="token string">"provider"</span> <span class="token punctuation">{</span>
+    <span class="token property">path</span>      <span class="token punctuation">=</span> <span class="token string">"provider.tf"</span>
+    <span class="token property">if_exists</span> <span class="token punctuation">=</span> <span class="token string">"overwrite"</span>
+    <span class="token property">contents</span> <span class="token punctuation">=</span> <span class="token heredoc string">&lt;&lt;EOF
+provider "aws" {
+  region              = "us-east-1"
+  version             = "= 2.3.1"
+  allowed_account_ids = ["1234567890"]
+}
+EOF</span>
+<span class="token punctuation">}</span>
+</code></pre>
+  </div>
+</div>
+
+<p>Then in a <code class=" highlighter-rouge language-plaintext">terragrunt.hcl</code> file, you could dynamically set
+  <code class=" highlighter-rouge language-plaintext">generate</code> as an attribute as follows:
+</p>
+
+<div class="language-hcl highlighter-rouge">
+  <div class="highlight">
+    <pre class="highlight language-hcl"><code class=" language-hcl"><span class="token keyword">locals</span> <span class="token punctuation">{</span>
+  <span class="token comment"># Load the data from common.hcl</span>
+  <span class="token property">common</span> <span class="token punctuation">=</span> read_terragrunt_config(find_in_parent_folders(<span class="token string">"common.hcl"</span>))
+<span class="token punctuation">}</span>
+
+<span class="token comment"># Set the generate config dynamically to the generate config in common.hcl</span>
+<span class="token property">generate</span> <span class="token punctuation">=</span> local.common.generate
+</code></pre>
+  </div>
+</div>
