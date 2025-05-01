@@ -1,5 +1,6 @@
--- Selects the cumulative sum and average for each country
+-- ADDED
 
+-- Selects the cumulative sum and average for each country
 DROP VIEW IF EXISTS "gdp_country_cumulative";
 
 CREATE VIEW "gdp_country_cumulative" AS

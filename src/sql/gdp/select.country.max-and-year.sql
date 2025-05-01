@@ -1,12 +1,13 @@
-WITH "value_max" AS (
-  SELECT 
-    "country",
-    MAX("value") as "max"
-  FROM 
-    "gdp"
-  GROUP BY
-    "country"
-)
+WITH 
+  "value_max" AS (
+    SELECT 
+      "country",
+      MAX("value") as "max"
+    FROM 
+      "gdp"
+    GROUP BY
+      "country"
+  )
 SELECT 
   g.id,
   m.country,
@@ -18,4 +19,5 @@ INNER JOIN
   "gdp" AS g ON g.value = m.max
 ORDER BY
   max DESC
+LIMIT 10
 ;

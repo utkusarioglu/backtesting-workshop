@@ -5,7 +5,7 @@ import numpy as np
 from datetime import datetime, timedelta
 from numba import njit
 from src.config import config
-from src.utils import apply_vbt_settings
+from src.utils.old import apply_vbt_settings
 
 apply_vbt_settings()
 
