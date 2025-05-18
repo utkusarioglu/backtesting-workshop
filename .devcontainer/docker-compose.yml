@@ -3,15 +3,13 @@ services:
     environment:
       GH_TOKEN: ${GH_TOKEN}
     stdin_open: true
-    # tty: true
     volumes:
       - type: volume
         source: vscode-server-extensions
-        target: /home/default/.vscode-server/extensions
+        target: /home/dev/.vscode-server/extensions
       - type: volume
         source: vscode-server-insiders-extensions
-        target: /home/default/.vscode-server-insiders/extensions
-    # command: /bin/sh -c "while sleep 1000; do :; done"
+        target: /home/dev/.vscode-server-insiders/extensions
 
 volumes:
   vscode-server-extensions:

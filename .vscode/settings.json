@@ -12,25 +12,12 @@
       "command": "gh secret set -f .env"
     }
   ],
-  "python.formatting.provider": "black",
-  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.typeCheckingMode": "standard",
   "jupyter.kernels.excludePythonEnvironments": [
     "/opt/conda/bin/python",
     "/usr/bin/python3"
   ],
-  "sqltools.useNodeRuntime": false,
-  "sqltools.connections": [
-    {
-      "previewLimit": 50,
-      "server": "backtesting-workshop-postgres",
-      "port": 5432,
-      "driver": "PostgreSQL",
-      "name": "backtesting-workshop-postgresql",
-      "database": "postgres",
-      "username": "postgres",
-      "password": "root"
-    }
-  ],
   "workbench.editor.limit.enabled": true,
   "workbench.editor.limit.value": 3,
+  "python.defaultInterpreterPath": "/opt/conda/envs/econ/bin/python"
 }
